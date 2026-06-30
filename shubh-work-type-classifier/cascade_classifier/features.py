@@ -56,6 +56,11 @@ _TI_PARATEXT = re.compile(r"""(?ix)
 """)
 _TI_LETTER = re.compile(r"\b(reply to|comment on|response to|letter to the editor|author'?s? reply|in response to|correspondence)\b", re.I)
 _TI_REVIEW_WORD = re.compile(r"\breview\b", re.I)
+# I11: explicit review-methodology phrases (only high-precision WITH a refs guard) + case-report
+# block. Searched over oa_title + tx_page_title (the page title carries the label oa_title truncates).
+_TI_REVIEW_PHRASE = re.compile(
+    r"\b(systematic review|meta-analysis|meta analysis|scoping review|narrative review|umbrella review)\b", re.I)
+_TI_CASE_REPORT = re.compile(r"\bcase (report|series)\b", re.I)
 
 # source_type values we expand into indicators (others fold into src_other)
 _SRC_LEVELS = ["journal", "repository", "conference", "book series", "ebook platform"]
@@ -96,6 +101,8 @@ def record_to_features(rec: dict) -> dict:
     vnorm = venue.strip().lower()
     _m = _DOI_PREFIX.search((rec.get("doi") or "").lower())
     dprefix = _m.group(0) if _m else ""
+    # I11: review-phrase / case-report searched over title + landing-page title
+    review_text = title + " " + (rec.get("tx_page_title") or "")
 
     f = {
         # structural
@@ -138,6 +145,8 @@ def record_to_features(rec: dict) -> dict:
         "ti_book_review": _b(_TI_BOOK_REVIEW.search(title)),
         "ti_letter": _b(_TI_LETTER.search(title)),
         "ti_review_word": _b(_TI_REVIEW_WORD.search(title)),
+        "ti_review_phrase": _b(_TI_REVIEW_PHRASE.search(review_text)),
+        "ti_case_report": _b(_TI_CASE_REPORT.search(review_text)),
         "ti_paratext": _b(_TI_PARATEXT.search(title)),
         # I8 single-type source allowlists (cascade-only; deliberately NOT in FEATURE_NAMES so the
         # residual tree is unchanged — these are deterministic venue rules, not tree features).

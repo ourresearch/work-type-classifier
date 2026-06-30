@@ -18,6 +18,7 @@
 --   has_abstract       -- abstract present (boolean)
 --   doi                -- DOI (lower-cased; for preprint DOI-registrant match)
 --   dc_type            -- lower-cased dc.type from landing-page <meta> (taxicab tx_meta); '' if none
+--   tx_page_title      -- landing-page <title> (taxicab); carries the review label oa title truncates
 
 WITH f AS (
   SELECT
@@ -26,6 +27,7 @@ WITH f AS (
     lower(coalesce(title, ''))  AS title_l,
     lower(coalesce(doi, ''))    AS doi_l,
     lower(coalesce(dc_type, '')) AS dc_type,
+    lower(concat(coalesce(title, ''), ' ', coalesce(tx_page_title, ''))) AS rev_text,
     (lower(coalesce(venue, '')) RLIKE '(proceedings|symposium|workshop|conference|congress|colloqui)') AS venue_proceedings
   FROM works
 )
@@ -208,8 +210,13 @@ SELECT
     WHEN title_l RLIKE '^(editorial|from the editor|in this issue|introduction|preface|foreword|guest editor)' THEN 'editorial'
     WHEN title_l RLIKE '(reply to|comment on|response to|letter to the editor|in response to|correspondence)' THEN 'letter'
 
-    -- 12. high-precision review gate: refs >= 150 (NOT 40 — that was only 16% precise) + abstract + not proceedings
-    WHEN n_refs >= 150 AND has_abstract AND NOT venue_proceedings THEN 'review'
+    -- 12. I11 guarded review: explicit review-methodology phrase (title OR landing-page title) +
+    --     substantial refs + abstract, with a case-report block. The bare refs>=150 gate measured
+    --     only 0.571 precision on the held-out (long original-research articles have 150+ refs);
+    --     this conjunction measured 1.00. Case-report blocks (only 2% of 'case report' are reviews).
+    WHEN rev_text RLIKE '(systematic review|meta-analysis|meta analysis|scoping review|narrative review|umbrella review)'
+         AND NOT rev_text RLIKE 'case (report|series)'
+         AND n_refs >= 100 AND has_abstract AND NOT venue_proceedings THEN 'review'
 
     -- residual: fuzzy article-boundary -> NULL, handed to the decision tree (or kept as oa_type)
     ELSE NULL

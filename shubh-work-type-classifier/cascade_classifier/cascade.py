@@ -150,10 +150,14 @@ def _r13(f):
     return "letter" if f["ti_letter"] else None
 
 
-@rule("review:high-refs")
+@rule("review:phrase+refs")
 def _r14(f):
-    # high-precision review gate: refs>=150 + has abstract + not a proceedings venue
-    if f["refs_ge_150"] and f["has_abstract"] and not f["venue_proceedings"]:
+    # I11: the bare refs>=150 gate measured only 0.571 precision on the 40.6k held-out (long
+    # original-research articles have 150+ refs too). Replaced with a guarded conjunction: an
+    # explicit review-methodology phrase (title or landing-page title) + a substantial ref count
+    # + abstract, with a case-report block. Measured 1.00 precision (n=27) on the held-out.
+    if (f["ti_review_phrase"] and not f["ti_case_report"]
+            and f["n_refs"] >= 100 and f["has_abstract"] and not f["venue_proceedings"]):
         return "review"
     return None
 

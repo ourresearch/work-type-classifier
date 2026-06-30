@@ -48,6 +48,7 @@ LEADERBOARD = [
     ("I5", "final hybrid (locked test)", "TEST", "0.773", "0.538", "0.812 / 0.945", "ship"),
     ("I8", "+ source allowlists (5 types)", "gold·10k", "0.789", "—", "0.839 / 0.945", "#547+preprint_servers; dataset/conf ↑ (held-out gold_master)"),
     ("I10", "+ dc.type (taxicab) rules", "gold52k·41k", "0.730", "—", "0.842 / 0.864", "de-leaked 52k held-out; editorial/book-review/dissertation recall ↑; cascade-only alone 0.760 (tree doesn't generalize at scale)"),
+    ("I11", "review: phrase+refs guard", "gold52k·41k", "0.730", "—", "0.843 / 0.860", "Jason's-technique; review precision 0.81→0.98 (cascade); dropped the 0.571 refs≥150 gate; case-report blocks"),
 ]
 
 INFOGAIN = [
@@ -94,7 +95,7 @@ REASONS = {
     "paratext": "title vocab + journal-issue; misses ISBN front/back-matter",
     "conference-abstract": "abstract-venue allowlist (I8) + dc.type=meeting-report (I10) + guard",
     "reference-entry": "Crossref reference-entry",
-    "review": "refs ≥150 gate + dc.type=review (I10)",
+    "review": "dc.type=review + guarded phrase·refs≥100 (I11, P 0.98); bare refs gate dropped",
     "preprint": "Crossref subtype + preprint-server allowlist (I8)",
     "other": "catch-all; inherently mixed",
     "peer-review": "Crossref peer-review",
