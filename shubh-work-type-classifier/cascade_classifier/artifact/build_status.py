@@ -31,8 +31,10 @@ def per_type_hitrates():
         n = len(idx)
         if n < 10:
             continue
-        c = sum(1 for i in idx if pred[i] == ty)
-        rows.append((ty, n, c, c / n))
+        c = sum(1 for i in idx if pred[i] == ty)            # true positives
+        npred = sum(1 for p in pred if p == ty)             # everything we labeled ty
+        prec = c / npred if npred else None                 # None = we never predict ty
+        rows.append((ty, n, c, c / n, prec))
     return rows
 
 
@@ -81,18 +83,19 @@ CROSSREF_TRUST = [
 ]
 
 
-def bar(label, pct, highlight=False):
+def bar(label, pct, prec, highlight=False):
     color = "#16a34a" if pct >= 0.75 else "#f59e0b" if pct >= 0.45 else "#dc2626"
     cls = " hl" if highlight else ""
+    ptxt = f"P {prec*100:.0f}%" if prec is not None else "P —"
     return (f'<div class="row{cls}"><div class="lab">{label}</div>'
             f'<div class="track"><div class="fill" style="width:{pct*100:.0f}%;background:{color}"></div></div>'
-            f'<div class="val">{pct*100:.0f}%</div></div>')
+            f'<div class="val">{pct*100:.0f}%</div><div class="prec">{ptxt}</div></div>')
 
 
 def build():
     rows = per_type_hitrates()
     hl = {"article", "paratext", "editorial"}
-    bars = "\n".join(bar(f"{ty} (n={n})", r, ty in hl) for ty, n, c, r in rows)
+    bars = "\n".join(bar(f"{ty} (n={n})", r, prec, ty in hl) for ty, n, c, r, prec in rows)
 
     lb = "\n".join(
         f"<tr class='{'ship' if it=='I5' else ''}'><td>{it}</td><td>{what}</td><td>{sp}</td>"
@@ -138,9 +141,10 @@ def build():
   .muted {{ color:var(--muted); }} .good {{ color:#16a34a; font-weight:600; }}
   code {{ background:#f1f5f9; padding:1px 6px; border-radius:5px; font-size:12.5px; }}
   .tag {{ font-size:11px; font-weight:600; color:#fff; background:var(--accent); padding:2px 8px; border-radius:999px; white-space:nowrap; }}
-  .row {{ display:grid; grid-template-columns:170px 1fr 44px; align-items:center; gap:10px; margin:5px 0; }}
+  .row {{ display:grid; grid-template-columns:170px 1fr 44px 52px; align-items:center; gap:10px; margin:5px 0; }}
   .row.hl .lab {{ font-weight:700; }}
   .lab {{ font-size:12.5px; }} .val {{ font-size:12.5px; text-align:right; color:var(--muted); }}
+  .prec {{ font-size:11.5px; text-align:right; color:#94a3b8; }}
   .track {{ background:#f1f5f9; border-radius:5px; height:14px; overflow:hidden; }}
   .fill {{ height:100%; border-radius:5px; }}
   .note {{ font-size:12.5px; color:var(--muted); margin-top:10px; }}
@@ -182,11 +186,16 @@ def build():
 </section>
 
 <section>
-  <h2><span class="n">Per-type</span>prediction success (locked test, n=2,146)</h2>
+  <h2><span class="n">Per-type</span>recall (bars) &amp; precision (locked test, n=2,146)</h2>
   {bars}
-  <p class="key">● green ≥75% · ● amber 45–74% · ● red &lt;45%. Bold = the types the team watches.
-  <b>Article is not sacrificed</b> (93%) while the big OpenAlex errors are recovered (conference-paper
-  0→73%, conference-abstract 0→49%). Editorial, book-review, reference-entry are the open cells.</p>
+  <p class="key">Bars are <b>recall</b> (of the real works of this type, how many we catch); the
+  <code>P&nbsp;%</code> on the right is <b>precision</b> (of what we label this type, how many are right).
+  Bar color: ● green ≥75% · ● amber 45–74% · ● red &lt;45%. Bold = the types the team watches.
+  <b>Article is not sacrificed</b> (93% recall) while the big OpenAlex errors are recovered (conference-paper
+  0→73%, conference-abstract 0→49%). <b>Paratext is high-precision, low-recall</b>: ~36% recall but ~91%
+  precision — when we call something paratext we are almost always right; we just miss the ISBN-bearing
+  book front/back-matter that the ISBN rule sends to book-chapter. Editorial, book-review and reference-entry
+  are the genuinely open cells (low on both axes).</p>
 </section>
 
 <section>
