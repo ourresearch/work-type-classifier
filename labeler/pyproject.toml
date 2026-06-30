@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "worktype-cli"
+version = "0.1.0"
+description = "Parallel work-type classification for OpenAlex/Crossref works (taxonomy #535) using Claude."
+requires-python = ">=3.9"
+dependencies = ["anthropic>=0.69"]
+
+[project.scripts]
+worktype = "worktype.cli:main"
+
+[tool.setuptools]
+packages = ["worktype"]
+
+[tool.setuptools.package-data]
+worktype = ["../data/taxonomy_descriptions.md"]
