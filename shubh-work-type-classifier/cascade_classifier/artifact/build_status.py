@@ -84,19 +84,51 @@ CROSSREF_TRUST = [
 ]
 
 
-def bar(label, pct, prec, highlight=False):
+# one short "why this number" per type — the rule (or absence of one) that drives it.
+REASONS = {
+    "article": "default / residual; the tree handles the article↔editorial boundary",
+    "book-chapter": "ISBN → book-chapter",
+    "conference-paper": "Crossref proceedings + #547 venue allowlist (I8)",
+    "editorial": "title cues only; hard residual cell",
+    "paratext": "title vocab + journal-issue; misses ISBN front/back-matter",
+    "conference-abstract": "abstract-venue allowlist (I8) + single-page/no-refs guard",
+    "reference-entry": "Crossref reference-entry",
+    "review": "refs ≥150 + abstract gate (no positive low-ref signal)",
+    "preprint": "Crossref subtype + preprint-server allowlist (I8)",
+    "other": "catch-all; inherently mixed",
+    "peer-review": "Crossref peer-review",
+    "retraction": "title 'retraction / withdrawn'",
+    "letter": "title 'reply / comment / letter'; weak signal",
+    "erratum": "title 'erratum / correction'",
+    "book-review": "title 'book review'; vocabulary-limited recall",
+    "dataset": "#547 repository allowlist (I8); no rule existed before",
+    "standard": "Crossref standard",
+    "book": "Crossref book / monograph",
+    "dissertation": "Crossref dissertation",
+    "report": "no rule yet → falls through to article",
+}
+
+
+def _meter(pct):
+    if pct is None:
+        return '<div class="meter"><div class="v">—</div></div>'
     color = "#16a34a" if pct >= 0.75 else "#f59e0b" if pct >= 0.45 else "#dc2626"
+    return (f'<div class="meter"><div class="track"><div class="fill" '
+            f'style="width:{pct*100:.0f}%;background:{color}"></div></div>'
+            f'<div class="v">{pct*100:.0f}%</div></div>')
+
+
+def bar(label, ty, recall, prec, highlight=False):
     cls = " hl" if highlight else ""
-    ptxt = f"P {prec*100:.0f}%" if prec is not None else "P —"
     return (f'<div class="row{cls}"><div class="lab">{label}</div>'
-            f'<div class="track"><div class="fill" style="width:{pct*100:.0f}%;background:{color}"></div></div>'
-            f'<div class="val">{pct*100:.0f}%</div><div class="prec">{ptxt}</div></div>')
+            f'{_meter(recall)}{_meter(prec)}'
+            f'<div class="reason">{REASONS.get(ty, "")}</div></div>')
 
 
 def build():
     rows = per_type_hitrates()
     hl = {"article", "paratext", "editorial"}
-    bars = "\n".join(bar(f"{ty} (n={n})", r, prec, ty in hl) for ty, n, c, r, prec in rows)
+    bars = "\n".join(bar(f"{ty} (n={n})", ty, r, prec, ty in hl) for ty, n, c, r, prec in rows)
 
     lb = "\n".join(
         f"<tr class='{'ship' if it=='I5' else ''}'><td>{it}</td><td>{what}</td><td>{sp}</td>"
@@ -142,12 +174,16 @@ def build():
   .muted {{ color:var(--muted); }} .good {{ color:#16a34a; font-weight:600; }}
   code {{ background:#f1f5f9; padding:1px 6px; border-radius:5px; font-size:12.5px; }}
   .tag {{ font-size:11px; font-weight:600; color:#fff; background:var(--accent); padding:2px 8px; border-radius:999px; white-space:nowrap; }}
-  .row {{ display:grid; grid-template-columns:170px 1fr 44px 52px; align-items:center; gap:10px; margin:5px 0; }}
+  .row {{ display:grid; grid-template-columns:160px 1.2fr 1.2fr 2fr; align-items:center; gap:14px; margin:5px 0; }}
   .row.hl .lab {{ font-weight:700; }}
-  .lab {{ font-size:12.5px; }} .val {{ font-size:12.5px; text-align:right; color:var(--muted); }}
-  .prec {{ font-size:11.5px; text-align:right; color:#94a3b8; }}
-  .track {{ background:#f1f5f9; border-radius:5px; height:14px; overflow:hidden; }}
-  .fill {{ height:100%; border-radius:5px; }}
+  .lab {{ font-size:12.5px; }}
+  .meter {{ display:flex; align-items:center; gap:7px; }}
+  .meter .track {{ flex:1; background:#f1f5f9; border-radius:5px; height:13px; overflow:hidden; }}
+  .meter .fill {{ height:100%; border-radius:5px; }}
+  .meter .v {{ width:34px; text-align:right; font-size:12px; color:var(--muted); }}
+  .reason {{ font-size:11.5px; color:#94a3b8; line-height:1.35; }}
+  .rowhead {{ display:grid; grid-template-columns:160px 1.2fr 1.2fr 2fr; gap:14px; margin:0 0 8px;
+    font-size:11px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); font-weight:600; }}
   .note {{ font-size:12.5px; color:var(--muted); margin-top:10px; }}
   .key {{ font-size:12px; color:var(--muted); margin-top:8px; }}
   .lead {{ color:#334155; }}
@@ -187,17 +223,18 @@ def build():
 </section>
 
 <section>
-  <h2><span class="n">Per-type</span>recall (bars) &amp; precision (locked test, n=2,146)</h2>
+  <h2><span class="n">Per-type</span>recall &amp; precision (locked test, n=2,146)</h2>
+  <div class="rowhead"><div>type</div><div>recall — caught</div><div>precision — right</div><div>why</div></div>
   {bars}
-  <p class="key">Bars are <b>recall</b> (of the real works of this type, how many we catch); the
-  <code>P&nbsp;%</code> on the right is <b>precision</b> (of what we label this type, how many are right).
-  Recomputed from the locked test split on the <b>current cascade (incl. I8 source allowlists)</b>.
-  Bar color: ● green ≥75% · ● amber 45–74% · ● red &lt;45%. Bold = the types the team watches.
+  <p class="key"><b>Recall</b> = of the real works of this type, how many we catch. <b>Precision</b> =
+  of what we label this type, how many are right. Both recomputed from the locked test split on the
+  <b>current cascade (incl. I8 source allowlists)</b>. Bar color: ● green ≥75% · ● amber 45–74% ·
+  ● red &lt;45%. Bold = the types the team watches.
   <b>Article is not sacrificed</b> (93% recall) while the big OpenAlex errors are recovered (conference-paper
-  0→85%, conference-abstract 0→47%, dataset 0→88%). <b>Paratext is high-precision, low-recall</b>: ~36% recall but ~91%
-  precision — when we call something paratext we are almost always right; we just miss the ISBN-bearing
-  book front/back-matter that the ISBN rule sends to book-chapter. Editorial, book-review and reference-entry
-  are the genuinely open cells (low on both axes).</p>
+  0→85%, conference-abstract 0→47%, dataset 0→88%). <b>Paratext is high-precision, low-recall</b> (~36% /
+  ~91%): when we call something paratext we are almost always right; we just miss the ISBN-bearing book
+  front/back-matter the ISBN rule sends to book-chapter. Editorial, book-review and reference-entry are the
+  genuinely open cells (low on both axes).</p>
 </section>
 
 <section>

@@ -25,12 +25,16 @@
   .muted { color:var(--muted); } .good { color:#16a34a; font-weight:600; }
   code { background:#f1f5f9; padding:1px 6px; border-radius:5px; font-size:12.5px; }
   .tag { font-size:11px; font-weight:600; color:#fff; background:var(--accent); padding:2px 8px; border-radius:999px; white-space:nowrap; }
-  .row { display:grid; grid-template-columns:170px 1fr 44px 52px; align-items:center; gap:10px; margin:5px 0; }
+  .row { display:grid; grid-template-columns:160px 1.2fr 1.2fr 2fr; align-items:center; gap:14px; margin:5px 0; }
   .row.hl .lab { font-weight:700; }
-  .lab { font-size:12.5px; } .val { font-size:12.5px; text-align:right; color:var(--muted); }
-  .prec { font-size:11.5px; text-align:right; color:#94a3b8; }
-  .track { background:#f1f5f9; border-radius:5px; height:14px; overflow:hidden; }
-  .fill { height:100%; border-radius:5px; }
+  .lab { font-size:12.5px; }
+  .meter { display:flex; align-items:center; gap:7px; }
+  .meter .track { flex:1; background:#f1f5f9; border-radius:5px; height:13px; overflow:hidden; }
+  .meter .fill { height:100%; border-radius:5px; }
+  .meter .v { width:34px; text-align:right; font-size:12px; color:var(--muted); }
+  .reason { font-size:11.5px; color:#94a3b8; line-height:1.35; }
+  .rowhead { display:grid; grid-template-columns:160px 1.2fr 1.2fr 2fr; gap:14px; margin:0 0 8px;
+    font-size:11px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); font-weight:600; }
   .note { font-size:12.5px; color:var(--muted); margin-top:10px; }
   .key { font-size:12px; color:var(--muted); margin-top:8px; }
   .lead { color:#334155; }
@@ -77,36 +81,37 @@
 </section>
 
 <section>
-  <h2><span class="n">Per-type</span>recall (bars) &amp; precision (locked test, n=2,146)</h2>
-  <div class="row hl"><div class="lab">article (n=973)</div><div class="track"><div class="fill" style="width:94%;background:#16a34a"></div></div><div class="val">94%</div><div class="prec">P 82%</div></div>
-<div class="row"><div class="lab">book-chapter (n=248)</div><div class="track"><div class="fill" style="width:98%;background:#16a34a"></div></div><div class="val">98%</div><div class="prec">P 74%</div></div>
-<div class="row"><div class="lab">conference-paper (n=175)</div><div class="track"><div class="fill" style="width:85%;background:#16a34a"></div></div><div class="val">85%</div><div class="prec">P 95%</div></div>
-<div class="row hl"><div class="lab">editorial (n=101)</div><div class="track"><div class="fill" style="width:19%;background:#dc2626"></div></div><div class="val">19%</div><div class="prec">P 73%</div></div>
-<div class="row hl"><div class="lab">paratext (n=90)</div><div class="track"><div class="fill" style="width:36%;background:#dc2626"></div></div><div class="val">36%</div><div class="prec">P 91%</div></div>
-<div class="row"><div class="lab">conference-abstract (n=86)</div><div class="track"><div class="fill" style="width:47%;background:#f59e0b"></div></div><div class="val">47%</div><div class="prec">P 61%</div></div>
-<div class="row"><div class="lab">reference-entry (n=70)</div><div class="track"><div class="fill" style="width:26%;background:#dc2626"></div></div><div class="val">26%</div><div class="prec">P 90%</div></div>
-<div class="row"><div class="lab">review (n=67)</div><div class="track"><div class="fill" style="width:57%;background:#f59e0b"></div></div><div class="val">57%</div><div class="prec">P 70%</div></div>
-<div class="row"><div class="lab">preprint (n=49)</div><div class="track"><div class="fill" style="width:100%;background:#16a34a"></div></div><div class="val">100%</div><div class="prec">P 94%</div></div>
-<div class="row"><div class="lab">other (n=40)</div><div class="track"><div class="fill" style="width:28%;background:#dc2626"></div></div><div class="val">28%</div><div class="prec">P 38%</div></div>
-<div class="row"><div class="lab">peer-review (n=30)</div><div class="track"><div class="fill" style="width:93%;background:#16a34a"></div></div><div class="val">93%</div><div class="prec">P 72%</div></div>
-<div class="row"><div class="lab">retraction (n=28)</div><div class="track"><div class="fill" style="width:89%;background:#16a34a"></div></div><div class="val">89%</div><div class="prec">P 86%</div></div>
-<div class="row"><div class="lab">erratum (n=26)</div><div class="track"><div class="fill" style="width:77%;background:#16a34a"></div></div><div class="val">77%</div><div class="prec">P 100%</div></div>
-<div class="row"><div class="lab">book-review (n=26)</div><div class="track"><div class="fill" style="width:4%;background:#dc2626"></div></div><div class="val">4%</div><div class="prec">P 100%</div></div>
-<div class="row"><div class="lab">letter (n=26)</div><div class="track"><div class="fill" style="width:46%;background:#f59e0b"></div></div><div class="val">46%</div><div class="prec">P 39%</div></div>
-<div class="row"><div class="lab">dataset (n=26)</div><div class="track"><div class="fill" style="width:88%;background:#16a34a"></div></div><div class="val">88%</div><div class="prec">P 72%</div></div>
-<div class="row"><div class="lab">standard (n=24)</div><div class="track"><div class="fill" style="width:96%;background:#16a34a"></div></div><div class="val">96%</div><div class="prec">P 53%</div></div>
-<div class="row"><div class="lab">book (n=22)</div><div class="track"><div class="fill" style="width:91%;background:#16a34a"></div></div><div class="val">91%</div><div class="prec">P 62%</div></div>
-<div class="row"><div class="lab">dissertation (n=16)</div><div class="track"><div class="fill" style="width:31%;background:#dc2626"></div></div><div class="val">31%</div><div class="prec">P 38%</div></div>
-<div class="row"><div class="lab">report (n=12)</div><div class="track"><div class="fill" style="width:0%;background:#dc2626"></div></div><div class="val">0%</div><div class="prec">P 0%</div></div>
-  <p class="key">Bars are <b>recall</b> (of the real works of this type, how many we catch); the
-  <code>P&nbsp;%</code> on the right is <b>precision</b> (of what we label this type, how many are right).
-  Recomputed from the locked test split on the <b>current cascade (incl. I8 source allowlists)</b>.
-  Bar color: ● green ≥75% · ● amber 45–74% · ● red &lt;45%. Bold = the types the team watches.
+  <h2><span class="n">Per-type</span>recall &amp; precision (locked test, n=2,146)</h2>
+  <div class="rowhead"><div>type</div><div>recall — caught</div><div>precision — right</div><div>why</div></div>
+  <div class="row hl"><div class="lab">article (n=973)</div><div class="meter"><div class="track"><div class="fill" style="width:94%;background:#16a34a"></div></div><div class="v">94%</div></div><div class="meter"><div class="track"><div class="fill" style="width:82%;background:#16a34a"></div></div><div class="v">82%</div></div><div class="reason">default / residual; the tree handles the article↔editorial boundary</div></div>
+<div class="row"><div class="lab">book-chapter (n=248)</div><div class="meter"><div class="track"><div class="fill" style="width:98%;background:#16a34a"></div></div><div class="v">98%</div></div><div class="meter"><div class="track"><div class="fill" style="width:74%;background:#f59e0b"></div></div><div class="v">74%</div></div><div class="reason">ISBN → book-chapter</div></div>
+<div class="row"><div class="lab">conference-paper (n=175)</div><div class="meter"><div class="track"><div class="fill" style="width:85%;background:#16a34a"></div></div><div class="v">85%</div></div><div class="meter"><div class="track"><div class="fill" style="width:95%;background:#16a34a"></div></div><div class="v">95%</div></div><div class="reason">Crossref proceedings + #547 venue allowlist (I8)</div></div>
+<div class="row hl"><div class="lab">editorial (n=101)</div><div class="meter"><div class="track"><div class="fill" style="width:19%;background:#dc2626"></div></div><div class="v">19%</div></div><div class="meter"><div class="track"><div class="fill" style="width:73%;background:#f59e0b"></div></div><div class="v">73%</div></div><div class="reason">title cues only; hard residual cell</div></div>
+<div class="row hl"><div class="lab">paratext (n=90)</div><div class="meter"><div class="track"><div class="fill" style="width:36%;background:#dc2626"></div></div><div class="v">36%</div></div><div class="meter"><div class="track"><div class="fill" style="width:91%;background:#16a34a"></div></div><div class="v">91%</div></div><div class="reason">title vocab + journal-issue; misses ISBN front/back-matter</div></div>
+<div class="row"><div class="lab">conference-abstract (n=86)</div><div class="meter"><div class="track"><div class="fill" style="width:47%;background:#f59e0b"></div></div><div class="v">47%</div></div><div class="meter"><div class="track"><div class="fill" style="width:61%;background:#f59e0b"></div></div><div class="v">61%</div></div><div class="reason">abstract-venue allowlist (I8) + single-page/no-refs guard</div></div>
+<div class="row"><div class="lab">reference-entry (n=70)</div><div class="meter"><div class="track"><div class="fill" style="width:26%;background:#dc2626"></div></div><div class="v">26%</div></div><div class="meter"><div class="track"><div class="fill" style="width:90%;background:#16a34a"></div></div><div class="v">90%</div></div><div class="reason">Crossref reference-entry</div></div>
+<div class="row"><div class="lab">review (n=67)</div><div class="meter"><div class="track"><div class="fill" style="width:57%;background:#f59e0b"></div></div><div class="v">57%</div></div><div class="meter"><div class="track"><div class="fill" style="width:70%;background:#f59e0b"></div></div><div class="v">70%</div></div><div class="reason">refs ≥150 + abstract gate (no positive low-ref signal)</div></div>
+<div class="row"><div class="lab">preprint (n=49)</div><div class="meter"><div class="track"><div class="fill" style="width:100%;background:#16a34a"></div></div><div class="v">100%</div></div><div class="meter"><div class="track"><div class="fill" style="width:94%;background:#16a34a"></div></div><div class="v">94%</div></div><div class="reason">Crossref subtype + preprint-server allowlist (I8)</div></div>
+<div class="row"><div class="lab">other (n=40)</div><div class="meter"><div class="track"><div class="fill" style="width:28%;background:#dc2626"></div></div><div class="v">28%</div></div><div class="meter"><div class="track"><div class="fill" style="width:38%;background:#dc2626"></div></div><div class="v">38%</div></div><div class="reason">catch-all; inherently mixed</div></div>
+<div class="row"><div class="lab">peer-review (n=30)</div><div class="meter"><div class="track"><div class="fill" style="width:93%;background:#16a34a"></div></div><div class="v">93%</div></div><div class="meter"><div class="track"><div class="fill" style="width:72%;background:#f59e0b"></div></div><div class="v">72%</div></div><div class="reason">Crossref peer-review</div></div>
+<div class="row"><div class="lab">retraction (n=28)</div><div class="meter"><div class="track"><div class="fill" style="width:89%;background:#16a34a"></div></div><div class="v">89%</div></div><div class="meter"><div class="track"><div class="fill" style="width:86%;background:#16a34a"></div></div><div class="v">86%</div></div><div class="reason">title 'retraction / withdrawn'</div></div>
+<div class="row"><div class="lab">book-review (n=26)</div><div class="meter"><div class="track"><div class="fill" style="width:4%;background:#dc2626"></div></div><div class="v">4%</div></div><div class="meter"><div class="track"><div class="fill" style="width:100%;background:#16a34a"></div></div><div class="v">100%</div></div><div class="reason">title 'book review'; vocabulary-limited recall</div></div>
+<div class="row"><div class="lab">erratum (n=26)</div><div class="meter"><div class="track"><div class="fill" style="width:77%;background:#16a34a"></div></div><div class="v">77%</div></div><div class="meter"><div class="track"><div class="fill" style="width:100%;background:#16a34a"></div></div><div class="v">100%</div></div><div class="reason">title 'erratum / correction'</div></div>
+<div class="row"><div class="lab">dataset (n=26)</div><div class="meter"><div class="track"><div class="fill" style="width:88%;background:#16a34a"></div></div><div class="v">88%</div></div><div class="meter"><div class="track"><div class="fill" style="width:72%;background:#f59e0b"></div></div><div class="v">72%</div></div><div class="reason">#547 repository allowlist (I8); no rule existed before</div></div>
+<div class="row"><div class="lab">letter (n=26)</div><div class="meter"><div class="track"><div class="fill" style="width:46%;background:#f59e0b"></div></div><div class="v">46%</div></div><div class="meter"><div class="track"><div class="fill" style="width:39%;background:#dc2626"></div></div><div class="v">39%</div></div><div class="reason">title 'reply / comment / letter'; weak signal</div></div>
+<div class="row"><div class="lab">standard (n=24)</div><div class="meter"><div class="track"><div class="fill" style="width:96%;background:#16a34a"></div></div><div class="v">96%</div></div><div class="meter"><div class="track"><div class="fill" style="width:53%;background:#f59e0b"></div></div><div class="v">53%</div></div><div class="reason">Crossref standard</div></div>
+<div class="row"><div class="lab">book (n=22)</div><div class="meter"><div class="track"><div class="fill" style="width:91%;background:#16a34a"></div></div><div class="v">91%</div></div><div class="meter"><div class="track"><div class="fill" style="width:62%;background:#f59e0b"></div></div><div class="v">62%</div></div><div class="reason">Crossref book / monograph</div></div>
+<div class="row"><div class="lab">dissertation (n=16)</div><div class="meter"><div class="track"><div class="fill" style="width:31%;background:#dc2626"></div></div><div class="v">31%</div></div><div class="meter"><div class="track"><div class="fill" style="width:38%;background:#dc2626"></div></div><div class="v">38%</div></div><div class="reason">Crossref dissertation</div></div>
+<div class="row"><div class="lab">report (n=12)</div><div class="meter"><div class="track"><div class="fill" style="width:0%;background:#dc2626"></div></div><div class="v">0%</div></div><div class="meter"><div class="track"><div class="fill" style="width:0%;background:#dc2626"></div></div><div class="v">0%</div></div><div class="reason">no rule yet → falls through to article</div></div>
+  <p class="key"><b>Recall</b> = of the real works of this type, how many we catch. <b>Precision</b> =
+  of what we label this type, how many are right. Both recomputed from the locked test split on the
+  <b>current cascade (incl. I8 source allowlists)</b>. Bar color: ● green ≥75% · ● amber 45–74% ·
+  ● red &lt;45%. Bold = the types the team watches.
   <b>Article is not sacrificed</b> (93% recall) while the big OpenAlex errors are recovered (conference-paper
-  0→85%, conference-abstract 0→47%, dataset 0→88%). <b>Paratext is high-precision, low-recall</b>: ~36% recall but ~91%
-  precision — when we call something paratext we are almost always right; we just miss the ISBN-bearing
-  book front/back-matter that the ISBN rule sends to book-chapter. Editorial, book-review and reference-entry
-  are the genuinely open cells (low on both axes).</p>
+  0→85%, conference-abstract 0→47%, dataset 0→88%). <b>Paratext is high-precision, low-recall</b> (~36% /
+  ~91%): when we call something paratext we are almost always right; we just miss the ISBN-bearing book
+  front/back-matter the ISBN rule sends to book-chapter. Editorial, book-review and reference-entry are the
+  genuinely open cells (low on both axes).</p>
 </section>
 
 <section>
