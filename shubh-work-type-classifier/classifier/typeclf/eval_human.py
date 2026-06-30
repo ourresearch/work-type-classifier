@@ -26,7 +26,7 @@ CACHE = os.path.join(DATA_DIR, "human_enriched.jsonl")
 
 def _import_enrich():
     """Reuse the labeler's enrich() without installing it (sibling package on disk)."""
-    labeler_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..", "labeler"))
+    labeler_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "..", "..", "labeler"))
     if labeler_dir not in sys.path:
         sys.path.insert(0, labeler_dir)
     from worktype.enrich import enrich  # type: ignore

@@ -11,14 +11,18 @@ import re
 import sys
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
-REPO = os.path.normpath(os.path.join(_HERE, ".."))
-DATA_DIR = os.path.join(REPO, "data")
+# Layout: <repo>/shubh-work-type-classifier/oxjob_909/data.py
+# NS   = .../shubh-work-type-classifier  (our namespace; classifier/ is a sibling)
+# ROOT = <repo>  (shared data/ + labeler/ live here, one level above the namespace)
+NS = os.path.normpath(os.path.join(_HERE, ".."))
+ROOT = os.path.normpath(os.path.join(_HERE, "..", ".."))
+DATA_DIR = os.path.join(ROOT, "data")
 # Renamed upstream (2026-06-30): gold_shard01 -> gold_random_10k, gold_strat -> gold_stratified.
 # (data/ also now has gold_master/gold_targeted — a future iteration can fold those in.)
 GOLD = ["gold_random_10k.jsonl", "gold_stratified.jsonl"]
 
-# reuse typeclf's normalizers (sibling package under classifier/)
-sys.path.insert(0, os.path.join(REPO, "classifier"))
+# reuse typeclf's normalizers (sibling package under shubh-work-type-classifier/classifier/)
+sys.path.insert(0, os.path.join(NS, "classifier"))
 from typeclf.dataset import _clean_doi, _norm_oaid  # type: ignore  # noqa: E402
 
 

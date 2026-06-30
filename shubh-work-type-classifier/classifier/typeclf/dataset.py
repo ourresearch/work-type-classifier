@@ -8,9 +8,10 @@ import re
 
 from .features import record_to_row
 
-# repo layout: classifier/typeclf/dataset.py  ->  ../../data
+# repo layout: shubh-work-type-classifier/classifier/typeclf/dataset.py  ->  ../../../data
+# (shared data/ lives at the real repo root, above the shubh-work-type-classifier namespace)
 _HERE = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.normpath(os.path.join(_HERE, "..", "..", "data"))
+DATA_DIR = os.path.normpath(os.path.join(_HERE, "..", "..", "..", "data"))
 
 # gold files were renamed upstream (2026-06-30): gold_shard01 -> gold_random_10k,
 # gold_strat -> gold_stratified, sample1000 -> gold_random_1k.

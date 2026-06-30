@@ -22,7 +22,7 @@ Both clear the "keep OpenAlex's current type" baseline (~0.71) by a wide margin.
 ## Install
 
 ```bash
-cd classifier
+cd shubh-work-type-classifier/classifier
 pip install -r requirements.txt        # scikit-learn, scipy, numpy, joblib
 ```
 

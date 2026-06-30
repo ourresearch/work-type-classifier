@@ -35,6 +35,8 @@ confusion matrices, and learnings are in [`JOURNAL.md`](./JOURNAL.md) + `iters/`
 
 ## Run
 
+Run these from the `shubh-work-type-classifier/` namespace dir (the parent of this package).
+
 ```bash
 pip install -r requirements.txt          # scikit-learn, scipy, numpy, statsmodels
 python -m oxjob_909.splits               # build the frozen split (once)
