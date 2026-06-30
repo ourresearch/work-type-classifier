@@ -1,0 +1,12 @@
+  book-family:isbn             fires= 362  precision=0.67
+  conference:proceedings       fires= 129  precision=0.93
+  preprint:cr_subtype          fires=  41  precision=1.00
+  book:whole                   fires=  27  precision=0.78
+  peer-review:crt              fires=  27  precision=1.00
+  title:editorial              fires=  27  precision=0.74
+  title:erratum                fires=  19  precision=1.00
+  review:high-refs             fires=  16  precision=0.62
+  title:retraction             fires=  15  precision=0.93
+  reference-entry:crt          fires=  10  precision=1.00
+  title:letter                 fires=   8  precision=0.62
+  title:book-review            fires=   3  precision=1.00

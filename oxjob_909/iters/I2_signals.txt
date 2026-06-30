@@ -1,0 +1,42 @@
+
+paratext vs article (top factors by |z|, separation-stable):  [McFadden pseudo-R²=0.80]
+  factor                    coef       z          p     odds
+  title_len                -3.27  -11.12    1.0e-28     0.04
+  has_abstract             -1.87   -6.70    2.0e-11     0.15
+  venue_proceedings         5.18    4.19    2.8e-05   177.88
+  container_present        -2.53   -3.02    2.6e-03     0.08
+
+review vs article (top factors by |z|, separation-stable):  [McFadden pseudo-R²=0.41]
+  factor                    coef       z          p     odds
+  n_refs                    1.31   13.55    8.0e-42     3.69
+  ti_review_word            4.89   12.45    1.3e-35   133.26
+  title_len                -1.04   -7.44    1.0e-13     0.35
+  src_repository            2.48    2.33    2.0e-02    12.00
+
+editorial vs article (top factors by |z|, separation-stable):  [McFadden pseudo-R²=0.35]
+  factor                    coef       z          p     odds
+  has_abstract             -1.23   -8.10    5.6e-16     0.29
+  n_refs                   -1.42   -7.87    3.7e-15     0.24
+  title_len                -0.76   -7.28    3.3e-13     0.47
+  single_page               0.74    4.35    1.3e-05     2.09
+
+conference-paper vs article (top factors by |z|, separation-stable):  [McFadden pseudo-R²=0.67]
+  factor                    coef       z          p     odds
+  n_refs                   -1.76   -7.17    7.4e-13     0.17
+  container_present        -2.22   -3.17    1.5e-03     0.11
+  title_len                -0.29   -2.46    1.4e-02     0.75
+  has_abstract              0.54    2.10    3.6e-02     1.72
+
+preprint vs article (top factors by |z|, separation-stable):  [McFadden pseudo-R²=0.95]
+  factor                    coef       z          p     odds
+  n_refs                    1.89    3.18    1.4e-03     6.61
+  has_abstract              1.73    1.32    1.9e-01     5.67
+  ti_review_word            2.88    0.51    6.1e-01    17.78
+  title_len                 0.06    0.16    8.8e-01     1.07
+
+letter vs article (top factors by |z|, separation-stable):  [McFadden pseudo-R²=0.29]
+  factor                    coef       z          p     odds
+  ti_letter                 5.93    7.81    5.9e-15   377.35
+  n_refs                   -2.47   -6.46    1.0e-10     0.08
+  has_abstract             -1.70   -6.46    1.1e-10     0.18
+  single_page               1.05    3.94    8.0e-05     2.85

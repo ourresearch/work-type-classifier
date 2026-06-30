@@ -1,0 +1,94 @@
+|--- crt_journal_article <= 0.50
+|   |--- crt_dataset <= 0.50
+|   |   |--- title_len <= 0.50
+|   |   |   |--- class: paratext
+|   |   |--- title_len >  0.50
+|   |   |   |--- crt_posted_content <= 0.50
+|   |   |   |   |--- n_refs <= 0.50
+|   |   |   |   |   |--- container_present <= 0.50
+|   |   |   |   |   |   |--- class: standard
+|   |   |   |   |   |--- container_present >  0.50
+|   |   |   |   |   |   |--- class: paratext
+|   |   |   |   |--- n_refs >  0.50
+|   |   |   |   |   |--- title_len <= 11.50
+|   |   |   |   |   |   |--- class: dissertation
+|   |   |   |   |   |--- title_len >  11.50
+|   |   |   |   |   |   |--- class: dissertation
+|   |   |   |--- crt_posted_content >  0.50
+|   |   |   |   |--- title_len <= 13.50
+|   |   |   |   |   |--- class: other
+|   |   |   |   |--- title_len >  13.50
+|   |   |   |   |   |--- class: supplementary-materials
+|   |--- crt_dataset >  0.50
+|   |   |--- title_len <= 10.50
+|   |   |   |--- src_repository <= 0.50
+|   |   |   |   |--- class: reference-entry
+|   |   |   |--- src_repository >  0.50
+|   |   |   |   |--- title_len <= 3.50
+|   |   |   |   |   |--- class: dataset
+|   |   |   |   |--- title_len >  3.50
+|   |   |   |   |   |--- title_len <= 6.50
+|   |   |   |   |   |   |--- class: dataset
+|   |   |   |   |   |--- title_len >  6.50
+|   |   |   |   |   |   |--- class: dataset
+|   |   |--- title_len >  10.50
+|   |   |   |--- class: peer-review
+|--- crt_journal_article >  0.50
+|   |--- n_refs <= 5.50
+|   |   |--- single_page <= 0.50
+|   |   |   |--- venue_preprint <= 0.50
+|   |   |   |   |--- has_abstract <= 0.50
+|   |   |   |   |   |--- title_len <= 3.50
+|   |   |   |   |   |   |--- class: paratext
+|   |   |   |   |   |--- title_len >  3.50
+|   |   |   |   |   |   |--- class: article
+|   |   |   |   |--- has_abstract >  0.50
+|   |   |   |   |   |--- n_refs <= 1.50
+|   |   |   |   |   |   |--- class: article
+|   |   |   |   |   |--- n_refs >  1.50
+|   |   |   |   |   |   |--- class: article
+|   |   |   |--- venue_preprint >  0.50
+|   |   |   |   |--- class: preprint
+|   |   |--- single_page >  0.50
+|   |   |   |--- n_refs <= 0.50
+|   |   |   |   |--- title_len <= 5.50
+|   |   |   |   |   |--- has_abstract <= 0.50
+|   |   |   |   |   |   |--- class: paratext
+|   |   |   |   |   |--- has_abstract >  0.50
+|   |   |   |   |   |   |--- class: article
+|   |   |   |   |--- title_len >  5.50
+|   |   |   |   |   |--- title_len <= 11.50
+|   |   |   |   |   |   |--- class: conference-abstract
+|   |   |   |   |   |--- title_len >  11.50
+|   |   |   |   |   |   |--- class: conference-abstract
+|   |   |   |--- n_refs >  0.50
+|   |   |   |   |--- n_refs <= 1.50
+|   |   |   |   |   |--- title_len <= 10.50
+|   |   |   |   |   |   |--- class: other
+|   |   |   |   |   |--- title_len >  10.50
+|   |   |   |   |   |   |--- class: retraction
+|   |   |   |   |--- n_refs >  1.50
+|   |   |   |   |   |--- n_refs <= 3.50
+|   |   |   |   |   |   |--- class: letter
+|   |   |   |   |   |--- n_refs >  3.50
+|   |   |   |   |   |   |--- class: article
+|   |--- n_refs >  5.50
+|   |   |--- ti_review_word <= 0.50
+|   |   |   |--- n_refs <= 107.00
+|   |   |   |   |--- venue_proceedings <= 0.50
+|   |   |   |   |   |--- src_journal <= 0.50
+|   |   |   |   |   |   |--- class: preprint
+|   |   |   |   |   |--- src_journal >  0.50
+|   |   |   |   |   |   |--- class: article
+|   |   |   |   |--- venue_proceedings >  0.50
+|   |   |   |   |   |--- class: conference-paper
+|   |   |   |--- n_refs >  107.00
+|   |   |   |   |--- title_len <= 12.50
+|   |   |   |   |   |--- class: review
+|   |   |   |   |--- title_len >  12.50
+|   |   |   |   |   |--- class: article
+|   |   |--- ti_review_word >  0.50
+|   |   |   |--- n_refs <= 53.50
+|   |   |   |   |--- class: review
+|   |   |   |--- n_refs >  53.50
+|   |   |   |   |--- class: review

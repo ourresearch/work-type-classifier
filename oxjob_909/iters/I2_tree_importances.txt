@@ -1,0 +1,15 @@
+  title_len              0.173
+  venue_preprint         0.159
+  crt_book               0.139
+  crt_peer_review        0.138
+  crt_journal_article    0.130
+  ti_erratum             0.125
+  container_present      0.113
+  has_isbn               0.010
+  src_journal            0.007
+  src_book_series        0.005
+  has_abstract           0.000
+  single_page            0.000
+  n_refs                 0.000
+  refs_40_99             0.000
+  refs_100_149           0.000

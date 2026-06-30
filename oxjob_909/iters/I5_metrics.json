@@ -1,0 +1,38 @@
+{
+  "accuracy": 0.7628,
+  "macro_f1": 0.5272,
+  "article_precision": 0.8196,
+  "article_recall": 0.9291,
+  "bleed": {
+    "editorial": {
+      "n": 101,
+      "recall": 0.188,
+      "->article": 66
+    },
+    "review": {
+      "n": 67,
+      "recall": 0.567,
+      "->article": 29
+    },
+    "letter": {
+      "n": 26,
+      "recall": 0.423,
+      "->article": 12
+    },
+    "paratext": {
+      "n": 90,
+      "recall": 0.367,
+      "->article": 8
+    },
+    "conference-paper": {
+      "n": 175,
+      "recall": 0.731,
+      "->article": 19
+    },
+    "conference-abstract": {
+      "n": 86,
+      "recall": 0.488,
+      "->article": 27
+    }
+  }
+}

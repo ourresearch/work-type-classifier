@@ -1,0 +1,13 @@
+true\pred              article book-chap conferenc editorial  paratext conferenc reference    review  preprint     other peer-revi retractio
+article                    921         0         3         0        10        19         0         9         1         1         0         1
+book-chapter                 0       243         0         0         4         0         0         0         0         0         0         0
+conference-paper            14        31       123         0         0         1         0         0         1         1         0         0
+editorial                   60         3         0        20         6         8         0         0         0         2         0         0
+paratext                     6        40         2         6        29         7         0         0         0         0         0         0
+conference-abstract         30         2         5         0         2        45         0         0         0         1         0         0
+reference-entry              0        37         0         0         6         0        15         0         0         0         2         0
+review                      31         0         0         0         0         2         0        33         0         0         0         1
+preprint                     0         0         0         0         0         0         0         1        47         0         0         0
+other                       15         0         0         0         8         5         0         0         0         4         2         0
+peer-review                  0         0         0         0         1         0         0         0         0         0        29         0
+retraction                   0         0         0         0         0         1         0         0         0         0         0        26
