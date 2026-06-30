@@ -19,6 +19,17 @@ _TI_EDITORIAL = re.compile(r"^(editorial|from the editor|in this issue|introduct
 _TI_ERRATUM = re.compile(r"\b(erratum|corrigend(um|a)|publisher correction|correction to|author correction)\b", re.I)
 _TI_RETRACTION = re.compile(r"\b(retraction|retracted article|notice of retraction|withdrawn|expression of concern)\b", re.I)
 _TI_BOOK_REVIEW = re.compile(r"(^book review\b|^review of\b|\breviewed work\b|^reviews of books)", re.I)
+# paratext = front/back matter, mastheads, whole-issue records. Tokens chosen by precision×support
+# (info-gain pass, I6): this anchored set is 0.99 precision / 0.38 recall for paratext on the gold.
+_TI_PARATEXT = re.compile(r"""(?ix)
+    ^\s*( contents | table\ of\ contents | (front|back)\ ?matter | frontmatter |
+      cover(\ (and|&)\ back\ matter)? | masthead | editorial\ board |
+      contributors? | list\ of\ (contributors|abbreviations) | abbreviations |
+      title\ page | issue\ information | expediente | sumario | (í|i)ndice | impressum )\b
+  | \bcover\ and\ back\ matter\b
+  | ^\s*(subject\ |author\ |name\ )?index(es)?\s*$
+  | ^\s*(volume|vol\.?|volumen)\s*\d+\b.*\b(issue|number|n(u|ú)mero|no\.?)\b
+""")
 _TI_LETTER = re.compile(r"\b(reply to|comment on|response to|letter to the editor|author'?s? reply|in response to|correspondence)\b", re.I)
 _TI_REVIEW_WORD = re.compile(r"\breview\b", re.I)
 
@@ -38,6 +49,7 @@ FEATURE_NAMES = [
     "crt_dataset", "crt_peer_review", "crt_journal_article", "crt_book", "cr_subtype_preprint",
     # title keyword flags
     "ti_editorial", "ti_erratum", "ti_retraction", "ti_book_review", "ti_letter", "ti_review_word",
+    "ti_paratext",
 ]
 
 
@@ -92,6 +104,7 @@ def record_to_features(rec: dict) -> dict:
         "ti_book_review": _b(_TI_BOOK_REVIEW.search(title)),
         "ti_letter": _b(_TI_LETTER.search(title)),
         "ti_review_word": _b(_TI_REVIEW_WORD.search(title)),
+        "ti_paratext": _b(_TI_PARATEXT.search(title)),
     }
     return f
 

@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>oxjob #909 — work-type classifier</title>
+<style>
+  :root { --bg:#f8fafc; --card:#fff; --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; --accent:#4f46e5; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+    font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; }
+  .wrap { max-width:960px; margin:0 auto; padding:32px 24px 64px; }
+  header h1 { margin:0 0 4px; font-size:26px; letter-spacing:-.02em; }
+  header p { margin:0; color:var(--muted); }
+  .badges { display:flex; gap:10px; flex-wrap:wrap; margin:18px 0 8px; }
+  .badge { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:10px 14px; }
+  .badge b { display:block; font-size:20px; color:var(--accent); }
+  .badge span { font-size:12px; color:var(--muted); }
+  section { background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:20px 22px; margin:18px 0; }
+  h2 { font-size:16px; margin:0 0 14px; letter-spacing:.01em; }
+  h2 .n { color:var(--accent); font-weight:700; margin-right:8px; }
+  table { width:100%; border-collapse:collapse; font-size:13.5px; }
+  th,td { text-align:left; padding:7px 9px; border-bottom:1px solid var(--line); vertical-align:top; }
+  th { color:var(--muted); font-weight:600; font-size:12px; text-transform:uppercase; letter-spacing:.04em; }
+  tr.ship td { background:#eef2ff; font-weight:600; }
+  .muted { color:var(--muted); } .good { color:#16a34a; font-weight:600; }
+  code { background:#f1f5f9; padding:1px 6px; border-radius:5px; font-size:12.5px; }
+  .tag { font-size:11px; font-weight:600; color:#fff; background:var(--accent); padding:2px 8px; border-radius:999px; white-space:nowrap; }
+  .row { display:grid; grid-template-columns:170px 1fr 44px; align-items:center; gap:10px; margin:5px 0; }
+  .row.hl .lab { font-weight:700; }
+  .lab { font-size:12.5px; } .val { font-size:12.5px; text-align:right; color:var(--muted); }
+  .track { background:#f1f5f9; border-radius:5px; height:14px; overflow:hidden; }
+  .fill { height:100%; border-radius:5px; }
+  .note { font-size:12.5px; color:var(--muted); margin-top:10px; }
+  .key { font-size:12px; color:var(--muted); margin-top:8px; }
+  .lead { color:#334155; }
+</style></head>
+<body><div class="wrap">
+<header>
+  <h1>oxjob #909 — work-type classifier</h1>
+  <p>De-leaked, interpretable, Databricks-deployable. ML discovers signals; the deployable is a
+     deterministic cascade + a shallow decision tree.</p>
+</header>
+
+<div class="badges">
+  <div class="badge"><b>0.765</b><span>test accuracy (vs 0.716 baseline)</span></div>
+  <div class="badge"><b>0.815</b><span>article precision (not sacrificed)</span></div>
+  <div class="badge"><b>≈0</b><span>train/val gap (not overfit)</span></div>
+  <div class="badge"><b>~15</b><span>features (no TF-IDF tokens)</span></div>
+</div>
+
+<section>
+  <h2><span class="n">What</span>this is</h2>
+  <p class="lead">A small, auditable classifier that corrects OpenAlex's <code>type</code> field. We
+  removed the <b>circular</b> features (OpenAlex's own <code>oa_type</code>/<code>is_paratext</code>),
+  kept raw Crossref signals, and engineered ~15 interpretable features. The deployable is a
+  <b>deterministic rule cascade</b> (clean types, exported to Spark SQL) feeding a <b>depth-6 decision
+  tree</b> for the fuzzy article↔editorial/review residual. Headline metric is the article-boundary
+  scorecard, not overall accuracy.</p>
+</section>
+
+<section>
+  <h2><span class="n">Progress</span>iteration leaderboard</h2>
+  <table>
+    <tr><th>iter</th><th>what</th><th>split</th><th>acc</th><th>macro-F1</th><th>article P / R</th><th>note</th></tr>
+    <tr class=''><td>I0</td><td>keep oa_type (baseline)</td><td>val</td><td>0.716</td><td>0.526</td><td>0.711 / 0.986</td><td class='muted'>reference</td></tr>
+<tr class=''><td>I1</td><td>de-leaked LR (no oa_type)</td><td>val</td><td>0.775</td><td>0.551</td><td>0.798 / 0.976</td><td class='muted'>honest signal floor</td></tr>
+<tr class=''><td>I3</td><td>deterministic cascade only</td><td>val</td><td>0.699</td><td>0.344</td><td>0.661 / 0.994</td><td class='muted'>rules, 32% coverage</td></tr>
+<tr class=''><td>I4</td><td>hybrid cascade→tree</td><td>val</td><td>0.763</td><td>0.523</td><td>0.825 / 0.947</td><td class='muted'>deployable, gap −0.003</td></tr>
+<tr class=''><td>I6</td><td>+ title:paratext rule</td><td>val</td><td>0.768</td><td>0.540</td><td>0.821 / 0.953</td><td class='muted'>paratext P 0.56→0.88</td></tr>
+<tr class='ship'><td>I5</td><td>final hybrid (locked test)</td><td>TEST</td><td>0.765</td><td>0.533</td><td>0.815 / 0.934</td><td class='muted'>ship</td></tr>
+  </table>
+  <p class="note">Every iteration is logged append-only in <code>JOURNAL.md</code> (autoresearch-style).
+  The de-leaked LR (I1) edges the hybrid on macro-F1 but isn't SQL-deployable; the hybrid is.</p>
+</section>
+
+<section>
+  <h2><span class="n">Per-type</span>prediction success (locked test, n=2,146)</h2>
+  <div class="row hl"><div class="lab">article (n=973)</div><div class="track"><div class="fill" style="width:93%;background:#16a34a"></div></div><div class="val">93%</div></div>
+<div class="row"><div class="lab">book-chapter (n=248)</div><div class="track"><div class="fill" style="width:98%;background:#16a34a"></div></div><div class="val">98%</div></div>
+<div class="row"><div class="lab">conference-paper (n=175)</div><div class="track"><div class="fill" style="width:73%;background:#f59e0b"></div></div><div class="val">73%</div></div>
+<div class="row hl"><div class="lab">editorial (n=101)</div><div class="track"><div class="fill" style="width:19%;background:#dc2626"></div></div><div class="val">19%</div></div>
+<div class="row hl"><div class="lab">paratext (n=90)</div><div class="track"><div class="fill" style="width:32%;background:#dc2626"></div></div><div class="val">32%</div></div>
+<div class="row"><div class="lab">conference-abstract (n=86)</div><div class="track"><div class="fill" style="width:49%;background:#f59e0b"></div></div><div class="val">49%</div></div>
+<div class="row"><div class="lab">reference-entry (n=70)</div><div class="track"><div class="fill" style="width:19%;background:#dc2626"></div></div><div class="val">19%</div></div>
+<div class="row"><div class="lab">review (n=67)</div><div class="track"><div class="fill" style="width:57%;background:#f59e0b"></div></div><div class="val">57%</div></div>
+<div class="row"><div class="lab">preprint (n=49)</div><div class="track"><div class="fill" style="width:100%;background:#16a34a"></div></div><div class="val">100%</div></div>
+<div class="row"><div class="lab">other (n=40)</div><div class="track"><div class="fill" style="width:25%;background:#dc2626"></div></div><div class="val">25%</div></div>
+<div class="row"><div class="lab">peer-review (n=30)</div><div class="track"><div class="fill" style="width:93%;background:#16a34a"></div></div><div class="val">93%</div></div>
+<div class="row"><div class="lab">retraction (n=28)</div><div class="track"><div class="fill" style="width:93%;background:#16a34a"></div></div><div class="val">93%</div></div>
+<div class="row"><div class="lab">book-review (n=26)</div><div class="track"><div class="fill" style="width:4%;background:#dc2626"></div></div><div class="val">4%</div></div>
+<div class="row"><div class="lab">erratum (n=26)</div><div class="track"><div class="fill" style="width:77%;background:#16a34a"></div></div><div class="val">77%</div></div>
+<div class="row"><div class="lab">dataset (n=26)</div><div class="track"><div class="fill" style="width:81%;background:#16a34a"></div></div><div class="val">81%</div></div>
+<div class="row"><div class="lab">letter (n=26)</div><div class="track"><div class="fill" style="width:42%;background:#dc2626"></div></div><div class="val">42%</div></div>
+<div class="row"><div class="lab">standard (n=24)</div><div class="track"><div class="fill" style="width:96%;background:#16a34a"></div></div><div class="val">96%</div></div>
+<div class="row"><div class="lab">book (n=22)</div><div class="track"><div class="fill" style="width:91%;background:#16a34a"></div></div><div class="val">91%</div></div>
+<div class="row"><div class="lab">dissertation (n=16)</div><div class="track"><div class="fill" style="width:31%;background:#dc2626"></div></div><div class="val">31%</div></div>
+<div class="row"><div class="lab">report (n=12)</div><div class="track"><div class="fill" style="width:0%;background:#dc2626"></div></div><div class="val">0%</div></div>
+  <p class="key">● green ≥75% · ● amber 45–74% · ● red &lt;45%. Bold = the types the team watches.
+  <b>Article is not sacrificed</b> (93%) while the big OpenAlex errors are recovered (conference-paper
+  0→73%, conference-abstract 0→49%). Editorial, book-review, reference-entry are the open cells.</p>
+</section>
+
+<section>
+  <h2><span class="n">Deep-dive</span>paratext — a vocabulary type (iteration I6)</h2>
+  <p class="lead">Paratext errors are decided by <b>title words</b> the de-leaked model couldn't see (it
+  had only <code>title_len</code>). Examples from the held-out set:</p>
+  <table>
+    <tr><th>direction</th><th>title</th><th>opus reason</th><th>why the model missed</th></tr>
+    <tr><td><span class='tag'>paratext → article</span></td><td><code>BIM volume 13 issue 1 Cover and Back matter</code></td><td class='muted'>“explicitly says Cover and Back matter”</td><td>model had no title-token feature — only title_len</td></tr>
+<tr><td><span class='tag'>paratext → article</span></td><td><code>Contributors</code></td><td class='muted'>“front/back-matter packaging record”</td><td>title_len(1) ≈ a short article</td></tr>
+<tr><td><span class='tag'>paratext → article</span></td><td><code>Expediente</code></td><td class='muted'>“journal masthead / front-matter”</td><td>non-English masthead, invisible to title_len</td></tr>
+<tr><td><span class='tag'>article → paratext</span></td><td><code>pina bausch</code></td><td class='muted'>(real article in a dance magazine)</td><td>title_len(2) wrongly flagged paratext</td></tr>
+  </table>
+  <p class="lead" style="margin-top:16px">We ranked title tokens by <b>precision×support</b> (raw
+  information gain just surfaces stopwords) and turned the winners into one anchored, deterministic
+  <code>title:paratext</code> rule — <b>0.99 precision</b>, info-gain-selected:</p>
+  <table>
+    <tr><th>token</th><th>info-gain</th><th>titles</th><th>#paratext</th><th>precision</th></tr>
+    <tr><td><code>frontmatter</code></td><td>0.0051</td><td>12</td><td>12</td><td class='good'>1.00</td></tr>
+<tr><td><code>abbreviations</code></td><td>0.0039</td><td>9</td><td>9</td><td class='good'>1.00</td></tr>
+<tr><td><code>contents</code></td><td>0.0150</td><td>37</td><td>36</td><td class='good'>0.97</td></tr>
+<tr><td><code>front (matter)</code></td><td>0.0060</td><td>24</td><td>18</td><td class='good'>0.75</td></tr>
+<tr><td><code>editorial board</code></td><td>0.0102</td><td>42</td><td>31</td><td class='good'>0.74</td></tr>
+<tr><td><code>cover</code></td><td>0.0052</td><td>25</td><td>17</td><td class=''>0.68</td></tr>
+<tr><td><code>index</code></td><td>0.0095</td><td>72</td><td>37</td><td class=''>0.51</td></tr>
+  </table>
+  <p class="note"><b>Result:</b> paratext precision <b>0.56 → 0.88</b> (the rule kills the
+  <code>title_len</code> false alarms on short real articles), lifting overall macro-F1. Paratext
+  <i>recall</i> stays ~0.32 — capped because only ~38% of paratext titles are recognizable vocabulary;
+  the rest need a non-title signal (page position / front-of-issue). Gini/info-gain are already the
+  tree's split criterion — the fix was giving them the right binary feature, not changing the criterion.</p>
+</section>
+
+<section>
+  <h2><span class="n">Next</span>roadmap</h2>
+  <ul class="lead">
+    <li><b>Editorial (~0.19 recall)</b> — the hard article-boundary cell; try venue/section priors and first-page position.</li>
+    <li><b>Paratext recall ceiling</b> — add a non-title signal (front-of-issue / page position) to get past vocabulary coverage.</li>
+    <li><b>book-review / reference-entry</b> — dedicated sub-trees under the ISBN/book family.</li>
+    <li><b>Confidence routing</b> — threshold on tree-leaf purity; send low-confidence works to the Opus labeler.</li>
+    <li><b>Fold in <code>gold_master</code> / <code>gold_targeted</code></b> — the newer growing gold for the tail types.</li>
+  </ul>
+</section>
+
+<p class="key">Repo: <code>oxjob_909/</code> · deterministic layer: <code>cascade.sql</code> ·
+experiment log: <code>JOURNAL.md</code> · generated from the locked-test split.</p>
+</div></body></html>

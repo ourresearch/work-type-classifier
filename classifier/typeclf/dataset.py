@@ -12,8 +12,10 @@ from .features import record_to_row
 _HERE = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.normpath(os.path.join(_HERE, "..", "..", "data"))
 
-TRAIN_JSONL = ["gold_shard01.jsonl", "gold_strat.jsonl"]
-VAL_JSONL = "sample1000.jsonl"
+# gold files were renamed upstream (2026-06-30): gold_shard01 -> gold_random_10k,
+# gold_strat -> gold_stratified, sample1000 -> gold_random_1k.
+TRAIN_JSONL = ["gold_random_10k.jsonl", "gold_stratified.jsonl"]
+VAL_JSONL = "gold_random_1k.jsonl"
 HUMAN_CSV = "human_annotated.csv"
 
 

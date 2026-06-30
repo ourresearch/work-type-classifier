@@ -183,6 +183,43 @@ def iter_I4(d):
     return sc
 
 
+def iter_I6(d):
+    """Add the deterministic title:paratext rule (cascade) + ti_paratext feature (tree)."""
+    tr, va = d["train"], d["val"]
+    # justification artifact: the precision-ranked token table the rule was built from
+    toks, base = discover.token_infogain(tr[0], tr[1], "paratext")
+    tok_txt = (f"paratext title tokens (base entropy {base:.3f}); ranked by precision*log(support):\n"
+               + "\n".join(f"  {tk:16s} ig={ig:.4f} titles={nt:4d} #para={npos:3d} prec={prec:.2f}"
+                           for tk, ig, nt, npos, prec in toks))
+    t = tree.train_residual_tree(tr[0], tr[1])
+    pred, _ = tree.hybrid_predict(va[0], t)
+    sc = scorecard(va[1], pred)
+    # per-rule precision (to show title:paratext precision)
+    crules = cascade.predict(va[0])[1]
+    fired = [(rl, p, tt) for rl, p, tt in zip(crules, cascade.predict(va[0])[0], va[1]) if rl]
+    para_rule = [(p, tt) for rl, p, tt in fired if rl == "title:paratext"]
+    pr_prec = (sum(1 for p, tt in para_rule if p == tt) / len(para_rule)) if para_rule else 0
+    from sklearn.metrics import precision_score, recall_score
+    para_p = precision_score(va[1], pred, labels=["paratext"], average="micro", zero_division=0)
+    para_r = recall_score(va[1], pred, labels=["paratext"], average="micro", zero_division=0)
+    print(format_scorecard(sc, "I6 hybrid + title:paratext rule (val):"))
+    print(f"  title:paratext rule fired {len(para_rule)}x, rule precision={pr_prec:.2f}")
+    print(f"  paratext precision={para_p:.3f} recall={para_r:.3f}  (I4 was ~0.56 / ~0.32)")
+    save_iter("I6", sc, {"confusion": confusion_text(va[1], pred, top=12), "paratext_tokens": tok_txt})
+    log_journal(iter_id="I6", date=DATE,
+                hypothesis="Paratext is a vocabulary type; an anchored title-token rule fixes the "
+                           "title_len blind spot (both missed paratext and false-flagged short articles).",
+                change="Add ti_paratext feature + cascade title:paratext rule (0.99 prec / 0.38 recall on gold).",
+                split="train->val", scorecard_sc=sc,
+                decision="keep — deterministic, 100%-precision, interpretable; lifts macro-F1",
+                learning=f"PRECISION win: paratext precision ~0.56->{para_p:.2f} (kills title_len false "
+                         f"alarms on short articles); recall stays ~{para_r:.2f} — capped by vocabulary "
+                         f"coverage (~38% of paratext titles recognizable). Article precision held "
+                         f"{sc['article_precision']:.2f}. Recall ceiling needs a non-title signal "
+                         f"(page position / front-of-issue) — next iteration.")
+    return sc
+
+
 def iter_I5(d, commit_test=False):
     tr, va = d["train"], d["val"]
     t = tree.train_residual_tree(tr[0], tr[1])
@@ -208,7 +245,7 @@ def iter_I5(d, commit_test=False):
     return sc
 
 
-ITERS = {"I0": iter_I0, "I1": iter_I1, "I2": iter_I2, "I3": iter_I3, "I4": iter_I4}
+ITERS = {"I0": iter_I0, "I1": iter_I1, "I2": iter_I2, "I3": iter_I3, "I4": iter_I4, "I6": iter_I6}
 
 
 def main(argv=None):

@@ -96,6 +96,43 @@ def format_signals(sig: dict, pseudo_r2=None,
     return "\n".join(lines)
 
 
+def token_infogain(records, labels, target, min_titles=8, min_target=4, top=20):
+    """Rank title tokens for a target type by information gain AND precision×support.
+
+    Raw IG alone surfaces stopwords (frequent but uninformative), so we also report
+    precision = P(target | token) and support — the right lens for picking DETERMINISTIC rules.
+    Returns rows: (token, infogain, n_titles, n_target, precision), sorted by precision*log(support).
+    """
+    import math
+    import re as _re
+
+    y = [1 if l == target else 0 for l in labels]
+    N, pos = len(y), sum(y)
+
+    def H(p):
+        return 0.0 if p in (0, 1) else -(p * math.log2(p) + (1 - p) * math.log2(1 - p))
+
+    base = H(pos / N) if N else 0.0
+    tok_docs, tok_pos = {}, {}
+    for rec, yy in zip(records, y):
+        title = (rec.get("oa_title") or rec.get("cr_title") or "").lower()
+        for tk in set(_re.findall(r"[a-záéíóúñ]+", title)):
+            tok_docs[tk] = tok_docs.get(tk, 0) + 1
+            tok_pos[tk] = tok_pos.get(tk, 0) + yy
+    rows = []
+    for tk, nt in tok_docs.items():
+        if nt < min_titles or tok_pos[tk] < min_target:
+            continue
+        p_in = tok_pos[tk] / nt
+        n_out = N - nt
+        p_out = (pos - tok_pos[tk]) / n_out if n_out else 0
+        ig = base - ((nt / N) * H(p_in) + (n_out / N) * H(p_out))
+        rows.append((tk, round(ig, 4), nt, tok_pos[tk], round(p_in, 3)))
+    # rank by precision * log(support) — high-precision, reasonably-frequent tokens make good rules
+    rows.sort(key=lambda r: -(r[4] * math.log(r[3] + 1)))
+    return rows[:top], base
+
+
 def tree_importances(records, labels, max_depth=5, top=15):
     from sklearn.tree import DecisionTreeClassifier
     X, names = to_matrix(records)

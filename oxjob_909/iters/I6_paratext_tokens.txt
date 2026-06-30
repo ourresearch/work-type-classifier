@@ -1,0 +1,21 @@
+paratext title tokens (base entropy 0.250); ranked by precision*log(support):
+  contents         ig=0.0159 titles=  22 #para= 22 prec=1.00
+  frontmatter      ig=0.0057 titles=   8 #para=  8 prec=1.00
+  board            ig=0.0098 titles=  28 #para= 19 prec=0.68
+  list             ig=0.0060 titles=  12 #para= 10 prec=0.83
+  table            ig=0.0059 titles=  19 #para= 12 prec=0.63
+  cover            ig=0.0044 titles=  14 #para=  9 prec=0.64
+  index            ig=0.0088 titles=  47 #para= 22 prec=0.47
+  front            ig=0.0042 titles=  15 #para=  9 prec=0.60
+  matter           ig=0.0048 titles=  25 #para= 12 prec=0.48
+  back             ig=0.0037 titles=  18 #para=  9 prec=0.50
+  issue            ig=0.0037 titles=  29 #para= 11 prec=0.38
+  journal          ig=0.0017 titles=   8 #para=  4 prec=0.50
+  editorial        ig=0.0052 titles=  83 #para= 21 prec=0.25
+  author           ig=0.0023 titles=  19 #para=  7 prec=0.37
+  volume           ig=0.0018 titles=  18 #para=  6 prec=0.33
+  information      ig=0.0019 titles=  41 #para=  9 prec=0.22
+  of               ig=0.0142 titles=2691 #para= 30 prec=0.01
+  and              ig=0.0137 titles=2026 #para= 13 prec=0.01
+  the              ig=0.0125 titles=1650 #para=  7 prec=0.00
+  for              ig=0.0067 titles= 956 #para=  4 prec=0.00

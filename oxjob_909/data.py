@@ -13,7 +13,9 @@ import sys
 _HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.normpath(os.path.join(_HERE, ".."))
 DATA_DIR = os.path.join(REPO, "data")
-GOLD = ["gold_shard01.jsonl", "gold_strat.jsonl"]
+# Renamed upstream (2026-06-30): gold_shard01 -> gold_random_10k, gold_strat -> gold_stratified.
+# (data/ also now has gold_master/gold_targeted — a future iteration can fold those in.)
+GOLD = ["gold_random_10k.jsonl", "gold_stratified.jsonl"]
 
 # reuse typeclf's normalizers (sibling package under classifier/)
 sys.path.insert(0, os.path.join(REPO, "classifier"))

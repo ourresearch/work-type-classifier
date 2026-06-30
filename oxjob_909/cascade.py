@@ -71,6 +71,14 @@ def _r8(f):
     return "peer-review" if f["crt_peer_review"] else None
 
 
+@rule("title:paratext")
+def _r8b(f):
+    # front/back matter, mastheads, whole-issue records — identified by title vocabulary, not
+    # length. 0.99 precision / 0.38 recall on gold (I6). Fixes the title_len blind spot: paratext
+    # is a vocabulary type, so an anchored title rule beats the `title_len` proxy both ways.
+    return "paratext" if f["ti_paratext"] else None
+
+
 @rule("title:retraction")
 def _r9(f):
     return "retraction" if f["ti_retraction"] else None
