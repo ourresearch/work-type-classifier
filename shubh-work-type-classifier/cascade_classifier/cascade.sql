@@ -17,6 +17,7 @@
 --   single_page        -- first_page = last_page (boolean)
 --   has_abstract       -- abstract present (boolean)
 --   doi                -- DOI (lower-cased; for preprint DOI-registrant match)
+--   dc_type            -- lower-cased dc.type from landing-page <meta> (taxicab tx_meta); '' if none
 
 WITH f AS (
   SELECT
@@ -24,6 +25,7 @@ WITH f AS (
     lower(coalesce(venue, ''))  AS venue_l,
     lower(coalesce(title, ''))  AS title_l,
     lower(coalesce(doi, ''))    AS doi_l,
+    lower(coalesce(dc_type, '')) AS dc_type,
     (lower(coalesce(venue, '')) RLIKE '(proceedings|symposium|workshop|conference|congress|colloqui)') AS venue_proceedings
   FROM works
 )
@@ -157,6 +159,47 @@ SELECT
 
     -- 6. peer-review
     WHEN lower(coalesce(cr_type,'')) = 'peer-review' THEN 'peer-review'
+
+    -- I10. dc.type from the taxicab landing-page scrape (tx_meta), ported from #545; re-measured
+    --      0.974 precision on held-out gold_full_52k. dc_type = lower(dc.type meta content).
+    WHEN dc_type IN (
+           'book reviews', 'book-review', 'bookreview', 'reseñas'
+        ) THEN 'book-review'
+    WHEN dc_type IN (
+           'article-commentary', 'editorial', 'editorialnotes'
+        ) THEN 'editorial'
+    WHEN dc_type IN (
+           'review', 'review article'
+        ) THEN 'review'
+    WHEN dc_type IN (
+           'dissertação', 'doctoral dissertation', 'pg_thesis', 'thesis'
+        ) THEN 'dissertation'
+    WHEN dc_type IN (
+           'retraction'
+        ) THEN 'retraction'
+    WHEN dc_type IN (
+           'correction'
+        ) THEN 'erratum'
+    WHEN dc_type IN (
+           'chapter'
+        ) THEN 'book-chapter'
+    WHEN dc_type IN (
+           'congress-abstract', 'meeting-report'
+        ) THEN 'conference-abstract'
+    WHEN dc_type IN (
+           'news'
+        ) THEN 'other'
+    WHEN dc_type IN (
+           'oxan-executive-summary'
+        ) THEN 'report'
+    WHEN dc_type IN (
+           'araştırma makalesi', 'article', 'articles', 'artigo original',
+           'artigos', 'artículos', 'artículos científicos', 'artículos de investigación',
+           'artículos originales', 'case report', 'case reports', 'case-report',
+           'communication', 'dossiê', 'makaleler', 'original articles',
+           'original papers', 'original research', 'papers', 'rapid-communication',
+           'research article', 'research articles', 'research papers'
+        ) THEN 'article'
 
     -- 7-11. title-prefix signals (high precision when the title states the genre)
     WHEN title_l RLIKE '(retraction|retracted article|notice of retraction|withdrawn|expression of concern)' THEN 'retraction'

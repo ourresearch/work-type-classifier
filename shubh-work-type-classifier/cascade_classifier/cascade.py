@@ -12,6 +12,7 @@ Rule order & thresholds are grounded in measured purity on the gold set:
 from __future__ import annotations
 
 from .features import record_to_features
+from . import dctype_map
 
 # ordered list of (rule_name, predicate(f) -> label or None)
 RULES = []
@@ -105,6 +106,14 @@ def _r7(f):
 @rule("peer-review:crt")
 def _r8(f):
     return "peer-review" if f["crt_peer_review"] else None
+
+
+@rule("dc.type:map")
+def _r8c(f):
+    # I10: landing-page dc.type (taxicab tx_meta) -> type, ported from #545 (>=93% precision).
+    # Stage 3: after trusted Crossref + source allowlists, before the weaker title regexes
+    # (dc.type=retraction 99% beats the title 'retraction' regex). Fires only when dc.type present.
+    return dctype_map.DCTYPE_MAP.get(f["dc_type"]) if f["dc_type"] else None
 
 
 @rule("paratext:title_or_issue")

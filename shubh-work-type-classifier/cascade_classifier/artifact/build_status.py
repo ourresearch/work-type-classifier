@@ -47,6 +47,7 @@ LEADERBOARD = [
     ("I7", "+ openalex-guts detective", "val", "0.771", "0.535", "0.814 / 0.966", "journal-issue cr_type signal"),
     ("I5", "final hybrid (locked test)", "TEST", "0.773", "0.538", "0.812 / 0.945", "ship"),
     ("I8", "+ source allowlists (5 types)", "gold·10k", "0.789", "—", "0.839 / 0.945", "#547+preprint_servers; dataset/conf ↑ (held-out gold_master)"),
+    ("I10", "+ dc.type (taxicab) rules", "gold52k·41k", "0.730", "—", "0.842 / 0.864", "de-leaked 52k held-out; editorial/book-review/dissertation recall ↑; cascade-only alone 0.760 (tree doesn't generalize at scale)"),
 ]
 
 INFOGAIN = [
@@ -89,22 +90,22 @@ REASONS = {
     "article": "default / residual; the tree handles the article↔editorial boundary",
     "book-chapter": "ISBN → book-chapter",
     "conference-paper": "Crossref proceedings + #547 venue allowlist (I8)",
-    "editorial": "title cues only; hard residual cell",
+    "editorial": "title cues + dc.type=editorial (I10); still the hard residual cell",
     "paratext": "title vocab + journal-issue; misses ISBN front/back-matter",
-    "conference-abstract": "abstract-venue allowlist (I8) + single-page/no-refs guard",
+    "conference-abstract": "abstract-venue allowlist (I8) + dc.type=meeting-report (I10) + guard",
     "reference-entry": "Crossref reference-entry",
-    "review": "refs ≥150 + abstract gate (no positive low-ref signal)",
+    "review": "refs ≥150 gate + dc.type=review (I10)",
     "preprint": "Crossref subtype + preprint-server allowlist (I8)",
     "other": "catch-all; inherently mixed",
     "peer-review": "Crossref peer-review",
-    "retraction": "title 'retraction / withdrawn'",
+    "retraction": "title + dc.type=retraction (I10)",
     "letter": "title 'reply / comment / letter'; weak signal",
-    "erratum": "title 'erratum / correction'",
-    "book-review": "title 'book review'; vocabulary-limited recall",
+    "erratum": "title + dc.type=correction (I10)",
+    "book-review": "title + dc.type=book-review (I10); recall 0.07→0.24",
     "dataset": "#547 repository allowlist (I8); no rule existed before",
     "standard": "Crossref standard",
     "book": "Crossref book / monograph",
-    "dissertation": "Crossref dissertation",
+    "dissertation": "Crossref + dc.type=thesis (I10); recall 0→0.33",
     "report": "no rule yet → falls through to article",
 }
 

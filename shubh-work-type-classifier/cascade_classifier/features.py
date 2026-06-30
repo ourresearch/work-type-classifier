@@ -15,6 +15,20 @@ from . import source_lists as SL
 
 _DOI_PREFIX = re.compile(r"10\.\d{3,9}")
 
+# I10: dc.type from the taxicab landing-page scrape (tx_meta = list of raw <meta> tag strings).
+_DCTYPE_NAME = re.compile(r'name=["\']?(?:dc\.?type|dcterms\.type)["\']?', re.I)
+_META_CONTENT = re.compile(r'content=["\'](.*?)["\']', re.I)
+
+
+def _dc_type(tx_meta):
+    """First dc.type value (lower-cased) from the tx_meta <meta> tag list, else ''."""
+    for tag in tx_meta or ():
+        if _DCTYPE_NAME.search(tag):
+            c = _META_CONTENT.search(tag)
+            if c:
+                return c.group(1).strip().lower()
+    return ""
+
 # --- regex vocab (anchored where possible to keep precision high) ---
 _VENUE_PROC = re.compile(r"\b(proceedings|symposium|workshop|conference|congress|colloqui)", re.I)
 _VENUE_PRE = re.compile(r"\b(ssrn|arxiv|biorxiv|medrxiv|chemrxiv|osf|research square|preprints?|zenodo|repository|hal-)\b", re.I)
@@ -132,6 +146,8 @@ def record_to_features(rec: dict) -> dict:
         "src_datapaper_list": _b(vnorm in SL.DATAPAPER_NAMES),
         "src_confpaper_list": _b(vnorm in SL.CONFPAPER_NAMES),
         "src_confabs_list": _b(vnorm in SL.CONFABS_NAMES),
+        # I10 dc.type (taxicab landing-page metadata; cascade-only, not in FEATURE_NAMES).
+        "dc_type": _dc_type(rec.get("tx_meta")),
     }
     return f
 
