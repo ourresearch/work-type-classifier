@@ -10,3 +10,6 @@ Labels are blind (no human/vendor label fed in). `is_changed` = `opus_type` diff
 | `gold_strat.csv` / `.jsonl` | ~1,360 | **stratified** oversample of under-represented/leaking types (editorial, letter, review, other, retraction, standard, erratum, peer-review, libguides) for training the deployable classifier. |
 
 CSV columns: `openalex_id, doi, landing_page_url, current_type, opus_type, opus_confidence, opus_reason, opus_is_broken, lp_status, error` (+ `is_changed` in regenerated outputs). `error=refusal` = safety-classifier refusal (hand-label).
+
+## Human-annotated reference
+`human_annotated.csv` — 200 works hand-labeled by the OpenAlex team (jason/casey/kyle/rohan; 166 with a label), combined with an `annotator` column. Original hand-annotation gold; pairs with the LLM gold for cross-checking. Note: some rows use pre-#535 vocabulary/typos.
