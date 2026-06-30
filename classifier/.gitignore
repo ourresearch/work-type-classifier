@@ -1,0 +1,5 @@
+# trained models — regenerable in ~15s via `python -m typeclf.train`
+models/
+*.joblib
+__pycache__/
+*.pyc
