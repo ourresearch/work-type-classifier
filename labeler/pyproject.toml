@@ -7,7 +7,8 @@ name = "worktype-cli"
 version = "0.1.0"
 description = "Parallel work-type classification for OpenAlex/Crossref works (taxonomy #535) using Claude."
 requires-python = ">=3.9"
-dependencies = ["anthropic>=0.69"]
+# Needs structured outputs (output_config.format) + adaptive thinking — recent SDK required.
+dependencies = ["anthropic>=0.69.0"]
 
 [project.scripts]
 worktype = "worktype.cli:main"
@@ -16,4 +17,4 @@ worktype = "worktype.cli:main"
 packages = ["worktype"]
 
 [tool.setuptools.package-data]
-worktype = ["../data/taxonomy_descriptions.md"]
+worktype = ["data/*.md"]

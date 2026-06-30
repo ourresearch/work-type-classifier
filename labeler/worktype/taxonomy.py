@@ -10,12 +10,12 @@ CANONICAL_TYPES = [
     "software-paper", "software", "standard", "supplementary-materials",
 ]
 
-_DATA = Path(__file__).resolve().parent.parent / "data"
+_DATA = Path(__file__).resolve().parent / "data"   # shipped inside the package (works for pip install, not just -e)
 
 
 def load_descriptions() -> str:
     """Full annotator-grade definitions for the 25 types (DESCRIPTIONS.md from #535)."""
-    return (_DATA / "taxonomy_descriptions.md").read_text()
+    return (_DATA / "taxonomy_descriptions.md").read_text(encoding="utf-8")
 
 
 SYSTEM_PROMPT = """You are a work-type classification council member for OpenAlex's classifier-improvement project. \

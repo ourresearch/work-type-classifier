@@ -11,7 +11,13 @@ DEFAULT_MODEL = "claude-opus-4-8"
 def make_client(max_retries: int = 8) -> anthropic.Anthropic:
     """One shared, thread-safe client. Reads ANTHROPIC_API_KEY (or an `ant auth login` profile) from the env.
     High max_retries so the SDK rides out 429/5xx under heavy concurrency with exponential backoff."""
-    return anthropic.Anthropic(max_retries=max_retries)
+    try:
+        return anthropic.Anthropic(max_retries=max_retries)
+    except Exception as e:
+        raise SystemExit(
+            "worktype: no Anthropic credentials found. Set ANTHROPIC_API_KEY (or run `ant auth login`) "
+            "before labeling — or pass --no-annotate to only enrich.\n  underlying: " + str(e)
+        )
 
 
 class Annotator:
@@ -44,6 +50,11 @@ class Annotator:
                 system=self._system,
                 messages=[{"role": "user", "content": user}],
             )
+        except TypeError as e:
+            # unexpected kwarg (output_config / adaptive thinking) => SDK too old. Fail fast & clearly.
+            raise SystemExit("worktype: your `anthropic` SDK is too old for this labeler "
+                             "(needs structured outputs + adaptive thinking). Run: pip install -U anthropic\n"
+                             "  underlying: " + str(e))
         except anthropic.APIError as e:
             return {"type": None, "is_broken": None, "confidence": None,
                     "reason": None, "_error": f"{type(e).__name__}: {getattr(e, 'message', e)}"}

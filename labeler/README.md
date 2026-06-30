@@ -16,9 +16,8 @@ writes both JSONL (full signals + annotation) and a tidy CSV.
 ## Install
 
 ```bash
-cd worktype-cli
-pip install -e .            # or: pip install -r requirements.txt
-export ANTHROPIC_API_KEY=sk-ant-...   # or: ant auth login
+pip install -e .            # from this directory (the labeler package). Or: pip install .
+export ANTHROPIC_API_KEY=sk-ant-...   # or: ant auth login  (needed only for labeling, not --no-annotate)
 ```
 
 ## Use
