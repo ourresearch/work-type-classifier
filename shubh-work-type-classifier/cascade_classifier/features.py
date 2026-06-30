@@ -11,6 +11,10 @@ from __future__ import annotations
 
 import re
 
+from . import source_lists as SL
+
+_DOI_PREFIX = re.compile(r"10\.\d{3,9}")
+
 # --- regex vocab (anchored where possible to keep precision high) ---
 _VENUE_PROC = re.compile(r"\b(proceedings|symposium|workshop|conference|congress|colloqui)", re.I)
 _VENUE_PRE = re.compile(r"\b(ssrn|arxiv|biorxiv|medrxiv|chemrxiv|osf|research square|preprints?|zenodo|repository|hal-)\b", re.I)
@@ -73,6 +77,11 @@ def record_to_features(rec: dict) -> dict:
     n_refs = rec.get("oa_n_refs")
     n_refs = n_refs if isinstance(n_refs, int) else 0
     container_present = bool(rec.get("cr_container") or rec.get("oa_source_name"))
+    # I8: single-type source allowlist membership (oxjob #547 + preprint_servers). NON-circular —
+    # keys on the venue NAME / DOI registrant, not OpenAlex's type. See source_lists.py.
+    vnorm = venue.strip().lower()
+    _m = _DOI_PREFIX.search((rec.get("doi") or "").lower())
+    dprefix = _m.group(0) if _m else ""
 
     f = {
         # structural
@@ -116,6 +125,13 @@ def record_to_features(rec: dict) -> dict:
         "ti_letter": _b(_TI_LETTER.search(title)),
         "ti_review_word": _b(_TI_REVIEW_WORD.search(title)),
         "ti_paratext": _b(_TI_PARATEXT.search(title)),
+        # I8 single-type source allowlists (cascade-only; deliberately NOT in FEATURE_NAMES so the
+        # residual tree is unchanged — these are deterministic venue rules, not tree features).
+        "src_preprint_list": _b(vnorm in SL.PREPRINT_NAMES or dprefix in SL.PREPRINT_PREFIXES),
+        "src_dataset_list": _b(vnorm in SL.DATASET_NAMES),
+        "src_datapaper_list": _b(vnorm in SL.DATAPAPER_NAMES),
+        "src_confpaper_list": _b(vnorm in SL.CONFPAPER_NAMES),
+        "src_confabs_list": _b(vnorm in SL.CONFABS_NAMES),
     }
     return f
 

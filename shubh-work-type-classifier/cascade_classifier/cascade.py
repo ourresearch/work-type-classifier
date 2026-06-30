@@ -29,6 +29,31 @@ def _r1(f):
     return "preprint" if f["cr_subtype_preprint"] else None
 
 
+# --- I8: single-type source allowlists (oxjob #547 + preprint_servers). Each measured on the
+# held-out gold_master: name-match precision preprint .995 / dataset 1.00 / conf-paper .965 /
+# conf-abstract .953 (+ preprint DOI-prefix .985). These venues publish essentially one type. ---
+
+
+@rule("preprint:source_list")
+def _r1b(f):
+    return "preprint" if f["src_preprint_list"] else None
+
+
+@rule("dataset:source_list")
+def _r1c(f):
+    return "dataset" if f["src_dataset_list"] else None
+
+
+@rule("data-paper:source_list")
+def _r1d(f):
+    return "data-paper" if f["src_datapaper_list"] else None
+
+
+@rule("conference-abstract:source_list")
+def _r1e(f):
+    return "conference-abstract" if f["src_confabs_list"] else None
+
+
 # NOTE: a `crt_posted_content -> preprint` rule (val precision 0.38) and a `crt_dataset -> dataset`
 # rule (0.46) were tried and REMOVED — they locked in errors; demoting dataset/repo-preprint to the
 # residual tree lifted macro-F1 0.498 -> 0.523 at no cost to accuracy or article precision (see I3).
@@ -38,6 +63,17 @@ def _r1(f):
 def _r4(f):
     if f["crt_proceedings"] or (f["venue_proceedings"] and f["src_conference"]):
         # split off abstract-only proceedings records
+        if f["single_page"] and f["n_refs"] == 0 and not f["has_abstract"]:
+            return "conference-abstract"
+        return "conference-paper"
+    return None
+
+
+@rule("conference-paper:source_list")
+def _r4b(f):
+    # named proceedings venues the `proceedings` regex misses (e.g. LNCS, CCIS). Same abstract
+    # split as the proceedings rule: a single-page, ref-less, abstract-only record is an abstract.
+    if f["src_confpaper_list"]:
         if f["single_page"] and f["n_refs"] == 0 and not f["has_abstract"]:
             return "conference-abstract"
         return "conference-paper"

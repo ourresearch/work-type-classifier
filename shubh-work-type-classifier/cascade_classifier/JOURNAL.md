@@ -18,6 +18,7 @@ much each neighbor type bleeds *into* article). Overall accuracy is reported but
 | I6 | + title:paratext rule | val | 0.768 | 0.540 | 0.821 / 0.953 | paratext precision 0.56→0.88 |
 | I7 | + openalex-guts detective signals | val | 0.771 | 0.535 | 0.814 / 0.966 | paratext recall via journal-issue cr_type |
 | **I5** | **final hybrid (incl. I7)** | **TEST (locked)** | **0.773** | **0.538** | **0.812 / 0.945** | **ship** |
+| I8 | + #547/preprint_servers source allowlists (5 types) | gold_master (held-out 10k) | 0.789 | — | 0.839 / 0.945 | vs 0.773 baseline on same set; dataset F 0→.71, conf-abstract .43→.50, conf-paper .83→.90 |
 
 **Bottom line:** the hybrid beats the keep-oa_type baseline on accuracy (0.773 vs 0.716) with no
 overfit (train/val gap ≈ 0), recovers the biggest OpenAlex errors — conference-paper recall 0→0.73,
@@ -96,3 +97,11 @@ signal that breaks the vocabulary ceiling, lifting paratext recall (test 0.32→
 - **Result:** acc=0.771, macro-F1=0.535, article P=0.814/R=0.966
 - **Decision:** keep — recall jumps with precision held
 - **Learning:** Paratext recall 0.37 (was ~0.31 at I6); precision 0.89; rule precision 1.00. The cr_type=journal-issue signal (65/66 paratext on gold) breaks the title-vocabulary ceiling — a non-title signal, as predicted. Article precision held 0.81.
+
+### I8 — 2026-06-30
+- **Hypothesis:** #544 is strong on Crossref-type trust but blind to the source/venue axis — it has no source-name/host/DOI-prefix rules. Five hard types (conference-paper, conference-abstract, data-paper, dataset, preprint) are dominated by single-type venues, so a curated source allowlist should add high-precision recall.
+- **Change:** New `source_lists.py` allowlists (generated from oxjob #547 `single-type-source-catalog` + `data/preprint_servers.csv`); 5 cascade rules keying on venue NAME (all 5 types) + DOI registrant (preprint only). NON-circular. Mirrored into `cascade.sql`. Cleaning: dataset-mixed venues (Zenodo/Figshare/OSF — only "preprint server" rows of preprint_servers.csv are trusted, not "general repository") and generic catalog labels (report/proceedings/preprints) excluded. Change isolated to the cascade (not added to FEATURE_NAMES → residual tree unchanged).
+- **Split:** **gold_master.jsonl (held-out, 10k; 1/10000 id overlap with #544 train — confirmed clean).** Eval set chosen per session decision.
+- **Result (gold_master, before → after):** overall acc **0.773 → 0.789**; article P **0.832 → 0.839** (held). Hybrid per-type F1: conference-paper .83→**.90**, conference-abstract .43→**.50**, dataset .56→**.71**, preprint .99→.99, data-paper 0→.67 (n=2, not meaningful). Cascade-only: dataset F 0→**.87**, conf-abstract F .02→.25, preprint recall **.805→.996**. Each new rule's precision on gold_master: preprint .939, dataset 1.00, conf-abstract .953, conf-paper .958, data-paper 1.00 — all ≥ the 0.86 HIGH bar.
+- **Decision:** keep — every target type improves or holds, article precision unchanged, all rules ≥0.94 precision.
+- **Learning:** Source-NAME match is the high-precision signal across all five types; DOI-prefix is clean only for preprint (dedicated registrants like 10.2139/SSRN) — shared registrants (10.1088/IOP, 10.1007/Springer) are too broad and were dropped at the 0.86 bar. The biggest deterministic wins were the cells with NO prior rule: dataset (cascade 0→.87 F) and conference-abstract (.02→.25 F). `data-paper` (n=2 in gold_master) stays unmeasurable here — coverage-only. Self-check: `python -m cascade_classifier.test_source_lists`.
