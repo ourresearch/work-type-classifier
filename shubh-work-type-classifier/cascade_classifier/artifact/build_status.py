@@ -46,6 +46,7 @@ LEADERBOARD = [
     ("I6", "+ paratext title rule", "val", "0.768", "0.540", "0.821 / 0.953", "paratext P 0.56→0.88"),
     ("I7", "+ openalex-guts detective", "val", "0.771", "0.535", "0.814 / 0.966", "journal-issue cr_type signal"),
     ("I5", "final hybrid (locked test)", "TEST", "0.773", "0.538", "0.812 / 0.945", "ship"),
+    ("I8", "+ source allowlists (5 types)", "gold·10k", "0.789", "—", "0.839 / 0.945", "#547+preprint_servers; dataset/conf ↑ (held-out gold_master)"),
 ]
 
 INFOGAIN = [
@@ -190,9 +191,10 @@ def build():
   {bars}
   <p class="key">Bars are <b>recall</b> (of the real works of this type, how many we catch); the
   <code>P&nbsp;%</code> on the right is <b>precision</b> (of what we label this type, how many are right).
+  Recomputed from the locked test split on the <b>current cascade (incl. I8 source allowlists)</b>.
   Bar color: ● green ≥75% · ● amber 45–74% · ● red &lt;45%. Bold = the types the team watches.
   <b>Article is not sacrificed</b> (93% recall) while the big OpenAlex errors are recovered (conference-paper
-  0→73%, conference-abstract 0→49%). <b>Paratext is high-precision, low-recall</b>: ~36% recall but ~91%
+  0→85%, conference-abstract 0→47%, dataset 0→88%). <b>Paratext is high-precision, low-recall</b>: ~36% recall but ~91%
   precision — when we call something paratext we are almost always right; we just miss the ISBN-bearing
   book front/back-matter that the ISBN rule sends to book-chapter. Editorial, book-review and reference-entry
   are the genuinely open cells (low on both axes).</p>
