@@ -88,10 +88,10 @@
 <div class="row"><div class="lab">other (n=40)</div><div class="track"><div class="fill" style="width:35%;background:#dc2626"></div></div><div class="val">35%</div></div>
 <div class="row"><div class="lab">peer-review (n=30)</div><div class="track"><div class="fill" style="width:93%;background:#16a34a"></div></div><div class="val">93%</div></div>
 <div class="row"><div class="lab">retraction (n=28)</div><div class="track"><div class="fill" style="width:93%;background:#16a34a"></div></div><div class="val">93%</div></div>
-<div class="row"><div class="lab">book-review (n=26)</div><div class="track"><div class="fill" style="width:4%;background:#dc2626"></div></div><div class="val">4%</div></div>
 <div class="row"><div class="lab">erratum (n=26)</div><div class="track"><div class="fill" style="width:77%;background:#16a34a"></div></div><div class="val">77%</div></div>
-<div class="row"><div class="lab">letter (n=26)</div><div class="track"><div class="fill" style="width:42%;background:#dc2626"></div></div><div class="val">42%</div></div>
+<div class="row"><div class="lab">book-review (n=26)</div><div class="track"><div class="fill" style="width:4%;background:#dc2626"></div></div><div class="val">4%</div></div>
 <div class="row"><div class="lab">dataset (n=26)</div><div class="track"><div class="fill" style="width:81%;background:#16a34a"></div></div><div class="val">81%</div></div>
+<div class="row"><div class="lab">letter (n=26)</div><div class="track"><div class="fill" style="width:42%;background:#dc2626"></div></div><div class="val">42%</div></div>
 <div class="row"><div class="lab">standard (n=24)</div><div class="track"><div class="fill" style="width:96%;background:#16a34a"></div></div><div class="val">96%</div></div>
 <div class="row"><div class="lab">book (n=22)</div><div class="track"><div class="fill" style="width:91%;background:#16a34a"></div></div><div class="val">91%</div></div>
 <div class="row"><div class="lab">dissertation (n=16)</div><div class="track"><div class="fill" style="width:31%;background:#dc2626"></div></div><div class="val">31%</div></div>
@@ -99,6 +99,32 @@
   <p class="key">● green ≥75% · ● amber 45–74% · ● red &lt;45%. Bold = the types the team watches.
   <b>Article is not sacrificed</b> (93%) while the big OpenAlex errors are recovered (conference-paper
   0→73%, conference-abstract 0→49%). Editorial, book-review, reference-entry are the open cells.</p>
+</section>
+
+<section>
+  <h2><span class="n">Deploy</span>HIGH-confidence Crossref-trust tier</h2>
+  <p class="lead">The Spark-SQL corrector (<code>worktype_rules.sql</code>) overrides OpenAlex's
+  <code>type</code> only when an independent signal fires, otherwise it keeps the current label. Its top
+  tier <b>trusts Crossref's own type</b> over OpenAlex's — every rule below is <b>≥86% precise</b> on the
+  full 12,123-work gold set. preprint is now <b>subtype-gated</b>: raw <code>posted-content</code> is only
+  71% (the rest is supplementary-materials/abstracts), so requiring Crossref <code>subtype=preprint</code>
+  lifts it to 99%.</p>
+  <table>
+    <tr><th>signal (independent of OpenAlex)</th><th>→ type</th><th>precision</th><th>n</th></tr>
+    <tr><td><code>crossref_type = peer-review</code></td><td>peer-review</td><td class='good'>100.0%</td><td class='muted'>235</td></tr>
+<tr><td><code>crossref_type = standard</code></td><td>standard</td><td class='good'>99.4%</td><td class='muted'>172</td></tr>
+<tr><td><code>posted-content + subtype = preprint</code></td><td>preprint</td><td class='good'>99.0%</td><td class='muted'>196</td></tr>
+<tr><td><code>crossref_type = dissertation</code></td><td>dissertation</td><td class='good'>98.7%</td><td class='muted'>78</td></tr>
+<tr><td><code>crossref_type = reference-entry</code></td><td>reference-entry</td><td class='good'>98.2%</td><td class='muted'>57</td></tr>
+<tr><td><code>source_type = conference</code></td><td>conference-paper</td><td class='good'>92.6%</td><td class='muted'>27</td></tr>
+<tr><td><code>crossref_type = journal-issue</code></td><td>paratext</td><td class='good'>91.7%</td><td class='muted'>84</td></tr>
+<tr><td><code>crossref_type in (monograph, edited-book)</code></td><td>book</td><td class='good'>86.7%</td><td class='muted'>83</td></tr>
+<tr><td><code>crossref_type = proceedings-article</code></td><td>conference-paper</td><td class='good'>86.5%</td><td class='muted'>706</td></tr>
+  </table>
+  <p class="note">Corrector mode (keep the current label when no rule fires) lifts accuracy
+  <b>67.4% → 73.6%</b> (+6.2pp): overrides fire on 31% of works at 79.6% precision, fixing 888 and
+  breaking 143 (net +745). The MEDIUM tier (ISBN/book-chapter 66–69%, journal-article + refs≥120 → review
+  79%) is added only in the aggressive rollout; the conservative rollout applies the HIGH tier alone.</p>
 </section>
 
 <section>
@@ -130,9 +156,10 @@
   split criterion — the fix was giving them the right binary feature, not changing the criterion.<br>
   <b>I7 result:</b> referencing the OpenAlex production detective (<code>openalex-guts
   work_type_detective.py</code>) added a richer title vocabulary <i>and</i> the structured
-  <code>cr_type=journal-issue</code> signal (<b>65/66 paratext</b> on gold) — the non-title signal that
-  breaks the vocabulary ceiling. Paratext recall rises (test 0.32→0.36; the rule alone is 0.99 precision
-  / 0.57 recall gold-wide) with precision held at 0.91.</p>
+  <code>cr_type=journal-issue</code> signal — the non-title signal that breaks the vocabulary ceiling.
+  It now sits in the HIGH-confidence Crossref-trust tier above: <b>journal-issue → paratext, 91.7%
+  precision (n=84)</b> on the full gold set. Paratext recall rises (test 0.32→0.36; the rule alone is
+  0.99 precision / 0.57 recall gold-wide) with precision held at 0.91.</p>
 </section>
 
 <section>

@@ -64,6 +64,22 @@ CONFUSIONS = [
     ("article → paratext", "pina bausch", "(real article in a dance magazine)", "title_len(2) wrongly flagged paratext"),
 ]
 
+# HIGH-confidence Crossref-trust tier — from the deployable corrector (sql/worktype_rules.sql),
+# measured on the full 12,123-work gold set. Each rule trusts Crossref's own type over OpenAlex's;
+# all >= 86% precision (sorted high → low). preprint is subtype-gated: raw posted-content is only
+# 71% (the rest is supplementary-materials/abstracts), so we require Crossref subtype='preprint' → 99%.
+CROSSREF_TRUST = [
+    ("crossref_type = peer-review", "peer-review", "100.0", "235"),
+    ("crossref_type = standard", "standard", "99.4", "172"),
+    ("posted-content + subtype = preprint", "preprint", "99.0", "196"),
+    ("crossref_type = dissertation", "dissertation", "98.7", "78"),
+    ("crossref_type = reference-entry", "reference-entry", "98.2", "57"),
+    ("source_type = conference", "conference-paper", "92.6", "27"),
+    ("crossref_type = journal-issue", "paratext", "91.7", "84"),
+    ("crossref_type in (monograph, edited-book)", "book", "86.7", "83"),
+    ("crossref_type = proceedings-article", "conference-paper", "86.5", "706"),
+]
+
 
 def bar(label, pct, highlight=False):
     color = "#16a34a" if pct >= 0.75 else "#f59e0b" if pct >= 0.45 else "#dc2626"
@@ -90,6 +106,10 @@ def build():
     conf = "\n".join(f"<tr><td><span class='tag'>{d}</span></td><td><code>{t}</code></td>"
                      f"<td class='muted'>{r}</td><td>{w}</td></tr>"
                      for d, t, r, w in CONFUSIONS)
+
+    trust = "\n".join(f"<tr><td><code>{sig}</code></td><td>{ty}</td>"
+                      f"<td class='good'>{pr}%</td><td class='muted'>{n}</td></tr>"
+                      for sig, ty, pr, n in CROSSREF_TRUST)
 
     html = f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
@@ -170,6 +190,24 @@ def build():
 </section>
 
 <section>
+  <h2><span class="n">Deploy</span>HIGH-confidence Crossref-trust tier</h2>
+  <p class="lead">The Spark-SQL corrector (<code>worktype_rules.sql</code>) overrides OpenAlex's
+  <code>type</code> only when an independent signal fires, otherwise it keeps the current label. Its top
+  tier <b>trusts Crossref's own type</b> over OpenAlex's — every rule below is <b>≥86% precise</b> on the
+  full 12,123-work gold set. preprint is now <b>subtype-gated</b>: raw <code>posted-content</code> is only
+  71% (the rest is supplementary-materials/abstracts), so requiring Crossref <code>subtype=preprint</code>
+  lifts it to 99%.</p>
+  <table>
+    <tr><th>signal (independent of OpenAlex)</th><th>→ type</th><th>precision</th><th>n</th></tr>
+    {trust}
+  </table>
+  <p class="note">Corrector mode (keep the current label when no rule fires) lifts accuracy
+  <b>67.4% → 73.6%</b> (+6.2pp): overrides fire on 31% of works at 79.6% precision, fixing 888 and
+  breaking 143 (net +745). The MEDIUM tier (ISBN/book-chapter 66–69%, journal-article + refs≥120 → review
+  79%) is added only in the aggressive rollout; the conservative rollout applies the HIGH tier alone.</p>
+</section>
+
+<section>
   <h2><span class="n">Deep-dive</span>paratext — a vocabulary type (iteration I6)</h2>
   <p class="lead">Paratext errors are decided by <b>title words</b> the de-leaked model couldn't see (it
   had only <code>title_len</code>). Examples from the held-out set:</p>
@@ -189,9 +227,10 @@ def build():
   split criterion — the fix was giving them the right binary feature, not changing the criterion.<br>
   <b>I7 result:</b> referencing the OpenAlex production detective (<code>openalex-guts
   work_type_detective.py</code>) added a richer title vocabulary <i>and</i> the structured
-  <code>cr_type=journal-issue</code> signal (<b>65/66 paratext</b> on gold) — the non-title signal that
-  breaks the vocabulary ceiling. Paratext recall rises (test 0.32→0.36; the rule alone is 0.99 precision
-  / 0.57 recall gold-wide) with precision held at 0.91.</p>
+  <code>cr_type=journal-issue</code> signal — the non-title signal that breaks the vocabulary ceiling.
+  It now sits in the HIGH-confidence Crossref-trust tier above: <b>journal-issue → paratext, 91.7%
+  precision (n=84)</b> on the full gold set. Paratext recall rises (test 0.32→0.36; the rule alone is
+  0.99 precision / 0.57 recall gold-wide) with precision held at 0.91.</p>
 </section>
 
 <section>
