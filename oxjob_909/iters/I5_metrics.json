@@ -1,13 +1,13 @@
 {
-  "accuracy": 0.7651,
-  "macro_f1": 0.5327,
-  "article_precision": 0.8152,
-  "article_recall": 0.9342,
+  "accuracy": 0.7726,
+  "macro_f1": 0.5385,
+  "article_precision": 0.8117,
+  "article_recall": 0.9527,
   "bleed": {
     "editorial": {
       "n": 101,
       "recall": 0.188,
-      "->article": 68
+      "->article": 72
     },
     "review": {
       "n": 67,
@@ -17,22 +17,22 @@
     "letter": {
       "n": 26,
       "recall": 0.423,
-      "->article": 13
+      "->article": 9
     },
     "paratext": {
       "n": 90,
-      "recall": 0.322,
-      "->article": 9
+      "recall": 0.356,
+      "->article": 10
     },
     "conference-paper": {
       "n": 175,
       "recall": 0.731,
-      "->article": 19
+      "->article": 20
     },
     "conference-abstract": {
       "n": 86,
-      "recall": 0.488,
-      "->article": 27
+      "recall": 0.384,
+      "->article": 33
     }
   }
 }

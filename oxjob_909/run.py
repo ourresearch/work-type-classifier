@@ -197,7 +197,7 @@ def iter_I6(d):
     # per-rule precision (to show title:paratext precision)
     crules = cascade.predict(va[0])[1]
     fired = [(rl, p, tt) for rl, p, tt in zip(crules, cascade.predict(va[0])[0], va[1]) if rl]
-    para_rule = [(p, tt) for rl, p, tt in fired if rl == "title:paratext"]
+    para_rule = [(p, tt) for rl, p, tt in fired if rl == "paratext:title_or_issue"]
     pr_prec = (sum(1 for p, tt in para_rule if p == tt) / len(para_rule)) if para_rule else 0
     from sklearn.metrics import precision_score, recall_score
     para_p = precision_score(va[1], pred, labels=["paratext"], average="micro", zero_division=0)
@@ -217,6 +217,37 @@ def iter_I6(d):
                          f"coverage (~38% of paratext titles recognizable). Article precision held "
                          f"{sc['article_precision']:.2f}. Recall ceiling needs a non-title signal "
                          f"(page position / front-of-issue) — next iteration.")
+    return sc
+
+
+def iter_I7(d):
+    """Improve paratext using the OpenAlex production detective: union its title patterns + the
+    container-level cr_type signal (journal-issue/journal-volume) into the cascade rule."""
+    from sklearn.metrics import precision_score, recall_score
+    tr, va = d["train"], d["val"]
+    t = tree.train_residual_tree(tr[0], tr[1])
+    pred, _ = tree.hybrid_predict(va[0], t)
+    sc = scorecard(va[1], pred)
+    crules = cascade.predict(va[0])
+    fired = [(rl, p, tt) for rl, p, tt in zip(crules[1], crules[0], va[1]) if rl == "paratext:title_or_issue"]
+    pr_prec = (sum(1 for _, p, tt in fired if p == tt) / len(fired)) if fired else 0
+    para_p = precision_score(va[1], pred, labels=["paratext"], average="micro", zero_division=0)
+    para_r = recall_score(va[1], pred, labels=["paratext"], average="micro", zero_division=0)
+    print(format_scorecard(sc, "I7 paratext via openalex-guts detective signals (val):"))
+    print(f"  paratext:title_or_issue rule fired {len(fired)}x, precision={pr_prec:.2f}")
+    print(f"  paratext precision={para_p:.3f} recall={para_r:.3f}  (I6 was ~0.88 / ~0.31)")
+    save_iter("I7", sc, {"confusion": confusion_text(va[1], pred, top=12)})
+    log_journal(iter_id="I7", date=DATE,
+                hypothesis="The OpenAlex production detective encodes paratext signals we lack — a "
+                           "richer title vocabulary AND a structured container cr_type (journal-issue).",
+                change="Union the detective's paratext title patterns (#535-filtered) + add crt_issue "
+                       "(journal-issue/journal-volume -> paratext) to the cascade rule.",
+                split="train->val", scorecard_sc=sc,
+                decision="keep — recall jumps with precision held",
+                learning=f"Paratext recall {para_r:.2f} (was ~0.31 at I6); precision {para_p:.2f}; rule "
+                         f"precision {pr_prec:.2f}. The cr_type=journal-issue signal (65/66 paratext on "
+                         f"gold) breaks the title-vocabulary ceiling — a non-title signal, as predicted. "
+                         f"Article precision held {sc['article_precision']:.2f}.")
     return sc
 
 
@@ -245,7 +276,8 @@ def iter_I5(d, commit_test=False):
     return sc
 
 
-ITERS = {"I0": iter_I0, "I1": iter_I1, "I2": iter_I2, "I3": iter_I3, "I4": iter_I4, "I6": iter_I6}
+ITERS = {"I0": iter_I0, "I1": iter_I1, "I2": iter_I2, "I3": iter_I3, "I4": iter_I4,
+         "I6": iter_I6, "I7": iter_I7}
 
 
 def main(argv=None):

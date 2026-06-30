@@ -71,12 +71,13 @@ def _r8(f):
     return "peer-review" if f["crt_peer_review"] else None
 
 
-@rule("title:paratext")
+@rule("paratext:title_or_issue")
 def _r8b(f):
-    # front/back matter, mastheads, whole-issue records — identified by title vocabulary, not
-    # length. 0.99 precision / 0.38 recall on gold (I6). Fixes the title_len blind spot: paratext
-    # is a vocabulary type, so an anchored title rule beats the `title_len` proxy both ways.
-    return "paratext" if f["ti_paratext"] else None
+    # paratext = front/back matter, mastheads, whole-issue records. Two high-precision signals
+    # (I6+I7, derived/validated vs the openalex-guts detective): the anchored title vocabulary
+    # (ti_paratext) OR a container-level Crossref type (journal-issue/journal-volume). Combined:
+    # 0.99 precision / 0.57 recall on gold — the cr_type signal breaks the title-vocabulary ceiling.
+    return "paratext" if (f["ti_paratext"] or f["crt_issue"]) else None
 
 
 @rule("title:retraction")

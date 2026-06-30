@@ -41,8 +41,9 @@ LEADERBOARD = [
     ("I1", "de-leaked LR (no oa_type)", "val", "0.775", "0.551", "0.798 / 0.976", "honest signal floor"),
     ("I3", "deterministic cascade only", "val", "0.699", "0.344", "0.661 / 0.994", "rules, 32% coverage"),
     ("I4", "hybrid cascade→tree", "val", "0.763", "0.523", "0.825 / 0.947", "deployable, gap −0.003"),
-    ("I6", "+ title:paratext rule", "val", "0.768", "0.540", "0.821 / 0.953", "paratext P 0.56→0.88"),
-    ("I5", "final hybrid (locked test)", "TEST", "0.765", "0.533", "0.815 / 0.934", "ship"),
+    ("I6", "+ paratext title rule", "val", "0.768", "0.540", "0.821 / 0.953", "paratext P 0.56→0.88"),
+    ("I7", "+ openalex-guts detective", "val", "0.771", "0.535", "0.814 / 0.966", "journal-issue cr_type signal"),
+    ("I5", "final hybrid (locked test)", "TEST", "0.773", "0.538", "0.812 / 0.945", "ship"),
 ]
 
 INFOGAIN = [
@@ -134,8 +135,8 @@ def build():
 </header>
 
 <div class="badges">
-  <div class="badge"><b>0.765</b><span>test accuracy (vs 0.716 baseline)</span></div>
-  <div class="badge"><b>0.815</b><span>article precision (not sacrificed)</span></div>
+  <div class="badge"><b>0.773</b><span>test accuracy (vs 0.716 baseline)</span></div>
+  <div class="badge"><b>0.812</b><span>article precision (not sacrificed)</span></div>
   <div class="badge"><b>≈0</b><span>train/val gap (not overfit)</span></div>
   <div class="badge"><b>~15</b><span>features (no TF-IDF tokens)</span></div>
 </div>
@@ -183,18 +184,21 @@ def build():
     <tr><th>token</th><th>info-gain</th><th>titles</th><th>#paratext</th><th>precision</th></tr>
     {ig}
   </table>
-  <p class="note"><b>Result:</b> paratext precision <b>0.56 → 0.88</b> (the rule kills the
-  <code>title_len</code> false alarms on short real articles), lifting overall macro-F1. Paratext
-  <i>recall</i> stays ~0.32 — capped because only ~38% of paratext titles are recognizable vocabulary;
-  the rest need a non-title signal (page position / front-of-issue). Gini/info-gain are already the
-  tree's split criterion — the fix was giving them the right binary feature, not changing the criterion.</p>
+  <p class="note"><b>I6 result:</b> paratext precision <b>0.56 → 0.88</b> (the rule kills the
+  <code>title_len</code> false alarms on short real articles). Gini/info-gain are already the tree's
+  split criterion — the fix was giving them the right binary feature, not changing the criterion.<br>
+  <b>I7 result:</b> referencing the OpenAlex production detective (<code>openalex-guts
+  work_type_detective.py</code>) added a richer title vocabulary <i>and</i> the structured
+  <code>cr_type=journal-issue</code> signal (<b>65/66 paratext</b> on gold) — the non-title signal that
+  breaks the vocabulary ceiling. Paratext recall rises (test 0.32→0.36; the rule alone is 0.99 precision
+  / 0.57 recall gold-wide) with precision held at 0.91.</p>
 </section>
 
 <section>
   <h2><span class="n">Next</span>roadmap</h2>
   <ul class="lead">
     <li><b>Editorial (~0.19 recall)</b> — the hard article-boundary cell; try venue/section priors and first-page position.</li>
-    <li><b>Paratext recall ceiling</b> — add a non-title signal (front-of-issue / page position) to get past vocabulary coverage.</li>
+    <li><b>Paratext recall</b> — I7 added the <code>journal-issue</code> cr_type signal (recall 0.32→0.36); next, page-position / front-of-issue for the long tail.</li>
     <li><b>book-review / reference-entry</b> — dedicated sub-trees under the ISBN/book family.</li>
     <li><b>Confidence routing</b> — threshold on tree-leaf purity; send low-confidence works to the Opus labeler.</li>
     <li><b>Fold in <code>gold_master</code> / <code>gold_targeted</code></b> — the newer growing gold for the tail types.</li>

@@ -20,13 +20,19 @@ _TI_ERRATUM = re.compile(r"\b(erratum|corrigend(um|a)|publisher correction|corre
 _TI_RETRACTION = re.compile(r"\b(retraction|retracted article|notice of retraction|withdrawn|expression of concern)\b", re.I)
 _TI_BOOK_REVIEW = re.compile(r"(^book review\b|^review of\b|\breviewed work\b|^reviews of books)", re.I)
 # paratext = front/back matter, mastheads, whole-issue records. Tokens chosen by precision×support
-# (info-gain pass, I6): this anchored set is 0.99 precision / 0.38 recall for paratext on the gold.
+# (info-gain, I6) and UNIONED with the OpenAlex production detective's paratext patterns (I7:
+# ourresearch/openalex-guts detective/work_type_detective.py:looks_like_paratext), filtered to the
+# #535 taxonomy (their obituary / notes-and-news -> `other`, excluded). 0.99 precision / 0.42 recall.
 _TI_PARATEXT = re.compile(r"""(?ix)
     ^\s*( contents | table\ of\ contents | (front|back)\ ?matter | frontmatter |
       cover(\ (and|&)\ back\ matter)? | masthead | editorial\ board |
-      contributors? | list\ of\ (contributors|abbreviations) | abbreviations |
-      title\ page | issue\ information | expediente | sumario | (í|i)ndice | impressum )\b
-  | \bcover\ and\ back\ matter\b
+      contributors? | list\ of\ (contributors|abbreviations|contents|tables|figures|plates) |
+      abbreviations | title\ page | issue\ (information|publication\ information|editorial\ masthead) |
+      author\ guidelines | author\ index | (back|front|inside\ back|inside\ front|inside)\ cover |
+      cover\ (image|picture) | frontispiece | graphical\ contents\ list | inhalt |
+      calendar\ of\ events | short(er)?\ notices | pages\ de\ d[ée]but | editor'?s\ preface |
+      call\ for\ papers | expediente | sumario | (í|i)ndice | impressum )\b
+  | \bcover\ and\ back\ matter\b | \[(front\ cover|inside\ back\ cover[^\]]*|masthead)\]
   | ^\s*(subject\ |author\ |name\ )?index(es)?\s*$
   | ^\s*(volume|vol\.?|volumen)\s*\d+\b.*\b(issue|number|n(u|ú)mero|no\.?)\b
 """)
@@ -46,7 +52,8 @@ FEATURE_NAMES = [
     "src_journal", "src_repository", "src_conference", "src_book_series", "src_ebook", "src_other",
     # upstream Crossref votes (non-circular)
     "crt_proceedings", "crt_posted_content", "crt_book_chapter", "crt_reference_entry",
-    "crt_dataset", "crt_peer_review", "crt_journal_article", "crt_book", "cr_subtype_preprint",
+    "crt_dataset", "crt_peer_review", "crt_journal_article", "crt_book", "crt_issue",
+    "cr_subtype_preprint",
     # title keyword flags
     "ti_editorial", "ti_erratum", "ti_retraction", "ti_book_review", "ti_letter", "ti_review_word",
     "ti_paratext",
@@ -96,6 +103,10 @@ def record_to_features(rec: dict) -> dict:
         "crt_peer_review": _b(crt == "peer-review"),
         "crt_journal_article": _b(crt == "journal-article"),
         "crt_book": _b(crt in ("book", "monograph", "edited-book", "reference-book")),
+        # container-level Crossref types = whole-issue/volume records = paratext (gold: journal-issue
+        # 65/66, journal-volume 2/2). From the openalex-guts detective lookup. The structured signal
+        # that lifts paratext recall past title-vocabulary coverage.
+        "crt_issue": _b(crt in ("journal-issue", "journal-volume")),
         "cr_subtype_preprint": _b((rec.get("cr_subtype") or "").lower() == "preprint"),
         # title keyword flags
         "ti_editorial": _b(_TI_EDITORIAL.search(title)),

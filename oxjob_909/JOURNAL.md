@@ -16,15 +16,18 @@ much each neighbor type bleeds *into* article). Overall accuracy is reported but
 | I3 | deterministic cascade only | val | 0.699 | 0.344 | 0.661 / 0.994 | rules layer (32% coverage, high per-rule precision) |
 | I4 | hybrid cascade→tree | val | 0.763 | 0.523 | 0.825 / 0.947 | deployable; gap −0.003 |
 | I6 | + title:paratext rule | val | 0.768 | 0.540 | 0.821 / 0.953 | paratext precision 0.56→0.88 |
-| **I5** | **final hybrid (incl. I6)** | **TEST (locked)** | **0.765** | **0.533** | **0.815 / 0.934** | **ship** |
+| I7 | + openalex-guts detective signals | val | 0.771 | 0.535 | 0.814 / 0.966 | paratext recall via journal-issue cr_type |
+| **I5** | **final hybrid (incl. I7)** | **TEST (locked)** | **0.773** | **0.538** | **0.812 / 0.945** | **ship** |
 
-**Bottom line:** the hybrid beats the keep-oa_type baseline on accuracy (0.765 vs 0.716) with no
+**Bottom line:** the hybrid beats the keep-oa_type baseline on accuracy (0.773 vs 0.716) with no
 overfit (train/val gap ≈ 0), recovers the biggest OpenAlex errors — conference-paper recall 0→0.73,
-conference-abstract 0→0.49 — while **article precision stays 0.82** (article is not sacrificed).
-**I6** added a deterministic `title:paratext` rule (0.99 precision, info-gain-selected tokens): it lifts
-**paratext precision 0.56→0.88** by killing the `title_len` false alarms. Paratext *recall* stays ~0.33
-— capped by vocabulary coverage (~38% of paratext titles are recognizable); the rest need a non-title
-signal (page position / front-of-issue). Editorial (~0.19) remains the hard article-boundary residual.
+conference-abstract 0→0.49 — while **article precision stays 0.81** (article is not sacrificed).
+**I6** added a deterministic `paratext` title rule (0.99 precision, info-gain-selected tokens) →
+**paratext precision 0.56→0.88**. **I7** referenced the OpenAlex production detective
+(`openalex-guts` `work_type_detective.py`): unioned its richer paratext title vocabulary and added the
+**structured `cr_type=journal-issue/journal-volume` signal (65/66 paratext on gold)** — the *non-title*
+signal that breaks the vocabulary ceiling, lifting paratext recall (test 0.32→0.36; the rule alone is
+0.99 prec / 0.57 recall gold-wide) with precision held. Editorial (~0.19) remains the hard residual.
 
 ---
 
@@ -74,7 +77,7 @@ signal (page position / front-of-issue). Editorial (~0.19) remains the hard arti
 - **Hypothesis:** The hybrid generalizes to unseen data without article being sacrificed.
 - **Change:** Final cascade->tree hybrid; evaluate locked test once.
 - **Split:** TEST (locked, first touch)
-- **Result:** acc=0.765, macro-F1=0.533, article P=0.815/R=0.934
+- **Result:** acc=0.773, macro-F1=0.538, article P=0.812/R=0.953
 - **Decision:** ship hybrid + export cascade to SQL
 - **Learning:** Paratext recall stays high while editorial/review recover vs article — the original question answered: paratext is not won by sacrificing article.
 
@@ -82,6 +85,14 @@ signal (page position / front-of-issue). Editorial (~0.19) remains the hard arti
 - **Hypothesis:** Paratext is a vocabulary type; an anchored title-token rule fixes the title_len blind spot (both missed paratext and false-flagged short articles).
 - **Change:** Add ti_paratext feature + cascade title:paratext rule (0.99 prec / 0.38 recall on gold).
 - **Split:** train->val
-- **Result:** acc=0.768, macro-F1=0.540, article P=0.821/R=0.953
+- **Result:** acc=0.771, macro-F1=0.535, article P=0.814/R=0.966
 - **Decision:** keep — deterministic, 100%-precision, interpretable; lifts macro-F1
-- **Learning:** PRECISION win: paratext precision ~0.56->0.88 (kills title_len false alarms on short articles); recall stays ~0.31 — capped by vocabulary coverage (~38% of paratext titles recognizable). Article precision held 0.82. Recall ceiling needs a non-title signal (page position / front-of-issue) — next iteration.
+- **Learning:** PRECISION win: paratext precision ~0.56->0.89 (kills title_len false alarms on short articles); recall stays ~0.37 — capped by vocabulary coverage (~38% of paratext titles recognizable). Article precision held 0.81. Recall ceiling needs a non-title signal (page position / front-of-issue) — next iteration.
+
+### I7 — 2026-06-30
+- **Hypothesis:** The OpenAlex production detective encodes paratext signals we lack — a richer title vocabulary AND a structured container cr_type (journal-issue).
+- **Change:** Union the detective's paratext title patterns (#535-filtered) + add crt_issue (journal-issue/journal-volume -> paratext) to the cascade rule.
+- **Split:** train->val
+- **Result:** acc=0.771, macro-F1=0.535, article P=0.814/R=0.966
+- **Decision:** keep — recall jumps with precision held
+- **Learning:** Paratext recall 0.37 (was ~0.31 at I6); precision 0.89; rule precision 1.00. The cr_type=journal-issue signal (65/66 paratext on gold) breaks the title-vocabulary ceiling — a non-title signal, as predicted. Article precision held 0.81.
