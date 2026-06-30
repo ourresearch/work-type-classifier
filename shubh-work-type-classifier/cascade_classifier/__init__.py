@@ -1,4 +1,4 @@
-"""oxjob #909 — feature-first, de-leaked, interpretable work-type classifier.
+"""oxjob #544 — feature-first, de-leaked, interpretable work-type classifier.
 
 ML is used here for *feature discovery*, not as the production model. The deployable artifact
 is a hybrid: a deterministic rule cascade for the clean types + a depth-limited decision tree

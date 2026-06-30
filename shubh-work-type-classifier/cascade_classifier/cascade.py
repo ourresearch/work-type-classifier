@@ -1,4 +1,4 @@
-"""Deterministic rule cascade (oxjob #909, iteration I3+).
+"""Deterministic rule cascade (oxjob #544, iteration I3+).
 
 Pure function over the engineered feature dict (features.record_to_features), so it is exactly
 expressible in SQL CASE / PySpark. Ordered most-specific -> least. Returns (label, rule_name);

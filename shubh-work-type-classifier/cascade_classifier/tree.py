@@ -1,4 +1,4 @@
-"""Depth-limited decision tree for the article-boundary residual (oxjob #909, iteration I4).
+"""Depth-limited decision tree for the article-boundary residual (oxjob #544, iteration I4).
 
 The cascade resolves the clean types; whatever it leaves (label None — mostly article vs
 editorial/review/letter/conference-abstract) goes to a shallow, interpretable tree over the

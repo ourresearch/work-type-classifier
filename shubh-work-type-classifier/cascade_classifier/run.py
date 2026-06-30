@@ -1,9 +1,9 @@
-"""Driver for oxjob #909 iterations I0-I5. Runs on the frozen splits, prints the scorecard +
+"""Driver for oxjob #544 iterations I0-I5. Runs on the frozen splits, prints the scorecard +
 confusion, writes per-iteration artifacts to iters/, and appends a JOURNAL.md entry.
 
-    python -m oxjob_909.run --iter I3       # one iteration
-    python -m oxjob_909.run --all           # I0..I4 on val (I5 touches the locked test set)
-    python -m oxjob_909.run --iter I5 --commit-test    # FINAL: evaluate the locked test set once
+    python -m cascade_classifier.run --iter I3       # one iteration
+    python -m cascade_classifier.run --all           # I0..I4 on val (I5 touches the locked test set)
+    python -m cascade_classifier.run --iter I5 --commit-test    # FINAL: evaluate the locked test set once
 
 Date is passed in (scripts can't call the clock); defaults to the planning date.
 """
@@ -281,7 +281,7 @@ ITERS = {"I0": iter_I0, "I1": iter_I1, "I2": iter_I2, "I3": iter_I3, "I4": iter_
 
 
 def main(argv=None):
-    ap = argparse.ArgumentParser(prog="oxjob_909.run")
+    ap = argparse.ArgumentParser(prog="cascade_classifier.run")
     ap.add_argument("--iter", choices=list(ITERS) + ["I5"])
     ap.add_argument("--all", action="store_true", help="run I0..I4 on val")
     ap.add_argument("--commit-test", action="store_true", help="I5 only: evaluate the locked test set")

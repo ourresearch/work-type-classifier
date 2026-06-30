@@ -1,6 +1,6 @@
-# oxjob #909 — experiment journal
+# oxjob #544 — experiment journal
 
-Append-only log of iterations (autoresearch-style). Entries are upserted by `oxjob_909.run`
+Append-only log of iterations (autoresearch-style). Entries are upserted by `cascade_classifier.run`
 (re-running an iteration replaces its block). Each entry: hypothesis · change · split · result
 (macro-F1 + article-boundary scorecard) · keep/discard · learning.
 

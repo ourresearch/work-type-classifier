@@ -11,7 +11,7 @@ import re
 import sys
 
 _HERE = os.path.dirname(os.path.abspath(__file__))
-# Layout: <repo>/shubh-work-type-classifier/oxjob_909/data.py
+# Layout: <repo>/shubh-work-type-classifier/cascade_classifier/data.py
 # NS   = .../shubh-work-type-classifier  (our namespace; classifier/ is a sibling)
 # ROOT = <repo>  (shared data/ + labeler/ live here, one level above the namespace)
 NS = os.path.normpath(os.path.join(_HERE, ".."))

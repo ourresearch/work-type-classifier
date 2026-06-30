@@ -1,4 +1,4 @@
-"""Engineered, NON-circular features for oxjob #909.
+"""Engineered, NON-circular features for oxjob #544.
 
 Deliberately excludes OpenAlex's own labels (`oa_type`, `oa_is_paratext`) — those are
 circular (predicting the thing we audit). Raw Crossref `cr_type`/`cr_subtype` are KEPT: they

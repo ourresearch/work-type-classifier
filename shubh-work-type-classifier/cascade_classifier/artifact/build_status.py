@@ -1,10 +1,10 @@
-"""Generate the self-contained oxjob #909 status artifact (status.html).
+"""Generate the self-contained oxjob #544 status artifact (status.html).
 
 Recomputes the per-type hit-rates from the locked test split so the chart is accurate; the
 leaderboard, info-gain table, and confusion examples are stable results pasted as narrative.
 Output is a single CSP-safe HTML page (inline CSS, no external requests). Run:
 
-    python -m oxjob_909.artifact.build_status
+    python -m cascade_classifier.artifact.build_status
 """
 from __future__ import annotations
 
@@ -94,7 +94,7 @@ def build():
     html = f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>oxjob #909 — work-type classifier</title>
+<title>oxjob #544 — work-type classifier</title>
 <style>
   :root {{ --bg:#f8fafc; --card:#fff; --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; --accent:#4f46e5; }}
   * {{ box-sizing:border-box; }}
@@ -129,7 +129,7 @@ def build():
 </style></head>
 <body><div class="wrap">
 <header>
-  <h1>oxjob #909 — work-type classifier</h1>
+  <h1>oxjob #544 — work-type classifier</h1>
   <p>De-leaked, interpretable, Databricks-deployable. ML discovers signals; the deployable is a
      deterministic cascade + a shallow decision tree.</p>
 </header>
@@ -205,7 +205,7 @@ def build():
   </ul>
 </section>
 
-<p class="key">Repo: <code>oxjob_909/</code> · deterministic layer: <code>cascade.sql</code> ·
+<p class="key">Repo: <code>cascade_classifier/</code> · deterministic layer: <code>cascade.sql</code> ·
 experiment log: <code>JOURNAL.md</code> · generated from the locked-test split.</p>
 </div></body></html>
 """

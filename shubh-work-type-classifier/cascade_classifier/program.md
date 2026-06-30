@@ -1,6 +1,6 @@
-# oxjob #909 — program (standing per-iteration instructions)
+# oxjob #544 — program (standing per-iteration instructions)
 
-This is the autoresearch-style "program" for #909: the fixed protocol every iteration follows.
+This is the autoresearch-style "program" for #544: the fixed protocol every iteration follows.
 Modeled on karpathy/autoresearch (a `program.md` + a keep/discard log on one metric), adapted
 to keep an explicit `JOURNAL.md` so the experiment history survives.
 
@@ -36,8 +36,8 @@ fuzzy article↔editorial/review residual).
 
 ```bash
 pip install -r requirements.txt
-python -m oxjob_909.run --all                 # I0..I4 on val
-python -m oxjob_909.run --iter I5 --commit-test   # FINAL: locked test, once
+python -m cascade_classifier.run --all                 # I0..I4 on val
+python -m cascade_classifier.run --iter I5 --commit-test   # FINAL: locked test, once
 ```
 
 ## Ideas backlog (next iterations)

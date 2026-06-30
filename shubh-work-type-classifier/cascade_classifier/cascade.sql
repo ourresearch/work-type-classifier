@@ -1,4 +1,4 @@
--- oxjob #909 — deterministic type cascade as a SQL CASE (Databricks / Spark SQL).
+-- oxjob #544 — deterministic type cascade as a SQL CASE (Databricks / Spark SQL).
 -- This is the rules layer (cascade.py, iteration I3) expressed in pure SQL — no model, no UDF,
 -- no external fetch. It assigns the clean/deterministic types and leaves the fuzzy
 -- article<->editorial/review residual as NULL (predicted_type IS NULL), which the deployed

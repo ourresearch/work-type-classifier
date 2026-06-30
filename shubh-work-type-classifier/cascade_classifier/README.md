@@ -1,6 +1,6 @@
-# oxjob #909 — feature-first, de-leaked, interpretable type classifier
+# oxjob #544 — feature-first, de-leaked, interpretable type classifier
 
-Pivot from the `../classifier` LogReg+TF-IDF model after team review. The learnings driving #909:
+Pivot from the `../classifier` LogReg+TF-IDF model after team review. The learnings driving #544:
 
 1. **Overall accuracy isn't enough** — report the confusion matrix + per-type behavior, and prove
    paratext isn't won by sacrificing article.
@@ -39,15 +39,15 @@ Run these from the `shubh-work-type-classifier/` namespace dir (the parent of th
 
 ```bash
 pip install -r requirements.txt          # scikit-learn, scipy, numpy, statsmodels
-python -m oxjob_909.splits               # build the frozen split (once)
-python -m oxjob_909.run --all            # I0..I4 on val (writes JOURNAL + iters/)
-python -m oxjob_909.run --iter I5 --commit-test   # FINAL: locked test, touched once
+python -m cascade_classifier.splits               # build the frozen split (once)
+python -m cascade_classifier.run --all            # I0..I4 on val (writes JOURNAL + iters/)
+python -m cascade_classifier.run --iter I5 --commit-test   # FINAL: locked test, touched once
 ```
 
 ## Layout
 
 ```
-oxjob_909/
+cascade_classifier/
   program.md     # standing per-iteration protocol (invariants, metric, keep/discard loop)
   JOURNAL.md     # the experiment log + leaderboard (one entry per iteration)
   data.py        # load raw gold enrichment records + labels (reuses ../classifier dataset)

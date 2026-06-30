@@ -1,4 +1,4 @@
-"""Standard reporting for oxjob #909: confusion matrix, the article-boundary scorecard,
+"""Standard reporting for oxjob #544: confusion matrix, the article-boundary scorecard,
 train/val overfit gap, and an append-only JOURNAL logger.
 
 The headline metric is NOT overall accuracy. It is macro-F1 + the article-boundary scorecard

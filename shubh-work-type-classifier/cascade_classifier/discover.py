@@ -1,4 +1,4 @@
-"""Feature discovery (oxjob #909, iteration I2): which 3-4 factors separate each type from
+"""Feature discovery (oxjob #544, iteration I2): which 3-4 factors separate each type from
 `article`? Uses an unpenalized multinomial logit (statsmodels MNLogit) for honest coefficients/
 p-values + a shallow tree for global importance. DISCOVERY ONLY — not the production model.
 
