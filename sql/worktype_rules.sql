@@ -1,4 +1,10 @@
 -- ============================================================================
+-- ⚠️ HISTORICAL ARTIFACT (June 2026) — NOT the deployed OpenAlex type classifier.
+-- This was an early ~13-rule distilled-corrector experiment. The complete,
+-- production rule cascade (the "~160 rules" from the July 2026 blog post, since
+-- grown) is public in the openalex-walden repo:
+--   https://github.com/ourresearch/openalex-walden/blob/main/notebooks/end2end/CreateLocationsWithTypes.ipynb
+-- ============================================================================
 -- worktype_rules.sql  —  Deterministic work-type CORRECTOR for Databricks (Spark SQL)
 -- ============================================================================
 -- WHAT THIS IS
